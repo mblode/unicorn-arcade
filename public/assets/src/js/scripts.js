@@ -30,6 +30,10 @@ function preload() {
     this.load.image('ship', 'assets/src/img/spaceShips_001.png');
     this.load.image('otherPlayer', 'assets/src/img/enemyBlack5.png');
     this.load.image('star', 'assets/src/img/star_gold.png');
+
+    for (var i = 1; i <= 21; i++) {
+        this.load.image(`block-`, `assets/src/img/blocks/${i}.png`);
+    }
 }
 
 function create() {
@@ -38,6 +42,10 @@ function create() {
     this.add.sprite(416, 416, 'grid');
 
     this.otherPlayers = this.add.group();
+
+    for (var i = 1; i <= 21; i++) {
+        this.add.image('star', `assets/src/img/blocks/${i}.png`);
+    }
 
     socket.on('currentPlayers', function (players) {
         Object.keys(players).forEach(function (id) {

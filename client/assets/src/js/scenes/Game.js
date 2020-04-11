@@ -1,5 +1,6 @@
 import io from 'socket.io-client';
-import { DataBlocks, DataBoard, DataMap } from '../helpers/Data';
+import { DataBlocks } from '../helpers/Data';
+import { playTurn } from '../helpers/Logic';
 import Block from '../components/Block';
 import Board from '../components/Board';
 import Start from '../components/Start';
@@ -24,37 +25,57 @@ export default class Game extends Phaser.Scene {
 
         this.socket = io('http://localhost:3000');
 
-        this.isPlayerA = false;
-        this.boardState = DataBoard;
+        this.state = {};
 
         this.board = new Board(this);
         this.renderBoard = this.board.renderBoard();
 
         this.start = new Start(this);
-        this.renderStart = this.start.renderStart();
+        this.startButton = this.start.renderStart();
+
+        this.scoreText = this.add.text(16, 16, '', { fontSize: '18px', fill: '#0000FF' });
 
         this.socket.on('connect', function() {
             console.log('Connected!');
         });
 
-        this.socket.on('isPlayerA', function() {
-            console.log('isPlayerA');
-            self.isPlayerA = true;
+        this.socket.on('currentPlayers', function(players) {
+            let id = players.findIndex(x => x.id === self.socket.id);
+
+            if (id > -1) {
+                self.player = players[id];
+                self.playerIndex = id;
+
+                console.log(players[id]);
+                console.log(id);
+            }
         });
 
-        this.socket.on('startGame', function() {
+        this.socket.on('startGame', function(state) {
             console.log('startGame!');
-            self.start.startGame();
-            self.renderStart.disableInteractive();
+
+            self.state = state;
+            self.start.startGame(state);
         });
 
-        this.socket.on('blockPlayed', function(gameObject, isPlayerA, values) {
-            console.log('blockPlayed');
+        this.socket.on('updateGameState', function(state, playerIndex, gameObject, values) {
+            console.log('updateGameState');
+            self.state = state;
 
-            if (isPlayerA !== self.isPlayerA) {
+            let scoreString = '';
+
+            for (let i = 0; i < state.players.length; i++) {
+                scoreString = scoreString + `${i}: ${state.players[i].score}, `;
+            }
+
+            self.scoreText.setText(scoreString);
+
+            if (playerIndex !== self.playerIndex) {
                 let sprite = gameObject.textureKey;
                 let block = new Block(self);
-                block.renderOpponent(gameObject.x, gameObject.y, values.index, sprite).disableInteractive();
+                block
+                    .renderOpponent(gameObject.x, gameObject.y, values.index, playerIndex, sprite)
+                    .disableInteractive();
             }
         });
 
@@ -74,16 +95,14 @@ export default class Game extends Phaser.Scene {
                 values = gameObject.data.values;
             }
 
-            gameObject.setData({ played: true });
-
-            gameObject.disableInteractive();
-            self.socket.emit('blockPlayed', gameObject, self.isPlayerA, values);
+            try {
+                self.state = playTurn(self.state, self.playerIndex, values.index, gameObject.x, gameObject.y);
+                self.socket.emit('updateGameState', self.state, self.playerIndex, gameObject, values);
+                gameObject.disableInteractive();
+            } catch (e) {
+                console.log(e);
+            }
         });
-
-        //     gameObject.x = Phaser.Math.Snap.To(gameObject.input.dragStartX);
-        //     gameObject.y = Phaser.Math.Snap.To(gameObject.input.dragStartY);
-        //     // dropZone.data.values.cards++;
-        //     // gameObject.x = dropZone.x - 350 + dropZone.data.values.cards * 50;
     }
 
     update() {}

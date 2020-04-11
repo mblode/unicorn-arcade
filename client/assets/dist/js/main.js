@@ -18,33 +18,48 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var Block = function Block(scene) {
   _classCallCheck(this, Block);
 
-  this.renderPlayer = function (index, isPlayerA) {
-    var block = scene.physics.add.sprite(0, 400, "block-".concat(index)).setOrigin(0, 0).setInteractive();
+  this.renderPlayer = function (blockIndex, playerIndex) {
+    var block = scene.physics.add.sprite(0, 400, "block-".concat(blockIndex)).setOrigin(0, 0).setInteractive();
     scene.input.setDraggable(block);
     block.setData({
-      shape: _helpers_Data__WEBPACK_IMPORTED_MODULE_0__["DataBlocks"][index],
+      shape: _helpers_Data__WEBPACK_IMPORTED_MODULE_0__["DataBlocks"][blockIndex],
       played: false,
-      index: index
+      index: blockIndex
     });
+    console.log(playerIndex);
 
-    if (isPlayerA) {
+    if (playerIndex == 0) {
       block.setTint(0x0000ff);
-    } else {
+    } else if (playerIndex == 1) {
       block.setTint(0xff0000);
+    } else if (playerIndex == 2) {
+      block.setTint(0x00ff00);
+    } else {
+      block.setTint(0xf00f0);
     }
 
     return block;
   };
 
-  this.renderOpponent = function (x, y, index, sprite) {
+  this.renderOpponent = function (x, y, blockIndex, playerIndex, sprite) {
     console.log('renderOpponent');
     var block = scene.physics.add.sprite(x, y, sprite).setOrigin(0, 0);
     block.setData({
-      shape: _helpers_Data__WEBPACK_IMPORTED_MODULE_0__["DataBlocks"][index],
+      shape: _helpers_Data__WEBPACK_IMPORTED_MODULE_0__["DataBlocks"][blockIndex],
       played: false,
-      index: index
+      index: blockIndex
     });
-    block.setTint(0xff0000);
+
+    if (playerIndex == 0) {
+      block.setTint(0x0000ff);
+    } else if (playerIndex == 1) {
+      block.setTint(0xff0000);
+    } else if (playerIndex == 2) {
+      block.setTint(0x00ff00);
+    } else {
+      block.setTint(0xf00f0);
+    }
+
     return block;
   };
 };
@@ -103,25 +118,36 @@ var Start = function Start(scene) {
   _classCallCheck(this, Start);
 
   this.renderStart = function () {
-    var start = scene.add.text(75, 350, ['Start Game']).setFontSize(18).setColor('#00ffff').setInteractive();
+    var start = scene.add.text(400, 30, ['Start Game']).setFontSize(18).setColor('#333333').setInteractive();
     start.on('pointerdown', function () {
       console.log('startGame!');
-      scene.socket.emit('startGame');
+      scene.socket.emit('startGame', _helpers_Data__WEBPACK_IMPORTED_MODULE_1__["DataBoard"]);
     });
     start.on('pointerover', function () {
-      start.setColor('#ff69b4');
+      start.setColor('#111111');
     });
     start.on('pointerout', function () {
-      start.setColor('#00ffff');
+      start.setColor('#222222');
     });
     return start;
   };
 
-  this.startGame = function () {
-    for (var i = 0; i < _helpers_Data__WEBPACK_IMPORTED_MODULE_1__["DataBlocks"].length; i++) {
-      var playerBlock = new _Block__WEBPACK_IMPORTED_MODULE_0__["default"](scene);
-      playerBlock.renderPlayer(i, scene.isPlayerA);
+  this.startGame = function (state) {
+    var scoreString = '';
+
+    for (var i = 0; i < state.players.length; i++) {
+      scoreString = scoreString += "".concat(i, ": ").concat(state.players[i].score, " ");
     }
+
+    scene.scoreText.setText(scoreString);
+
+    for (var _i = 0; _i < _helpers_Data__WEBPACK_IMPORTED_MODULE_1__["DataBlocks"].length; _i++) {
+      var playerBlock = new _Block__WEBPACK_IMPORTED_MODULE_0__["default"](scene);
+      playerBlock.renderPlayer(_i, scene.playerIndex);
+    }
+
+    scene.startButton.disableInteractive();
+    scene.startButton.visible = 0;
   };
 };
 
@@ -151,10 +177,207 @@ var DataBlocks = [[[1]], [[1, 1]], [[1, 1], [0, 1]], [[1, 1, 1]], [[1, 1], [1, 1
 /*!****************************************!*\
   !*** ./assets/src/js/helpers/Logic.js ***!
   \****************************************/
-/*! exports provided: default */
-/***/ (function(module, exports) {
+/*! exports provided: arraySum, testSides, testCorners, testBoard, updateBoard, renderBoard, playTurn */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-throw new Error("Module build failed (from ./node_modules/babel-loader/lib/index.js):\nSyntaxError: /Users/mblode/Sites/unicorn/client/assets/src/js/helpers/Logic.js: Unexpected token, expected \";\" (54:28)\n\n\u001b[0m \u001b[90m 52 | \u001b[39m                currentHit \u001b[33m=\u001b[39m \u001b[36mtrue\u001b[39m\u001b[33m;\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 53 | \u001b[39m            } \u001b[36melse\u001b[39m {\u001b[0m\n\u001b[0m\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 54 | \u001b[39m                \u001b[36mfor\u001b[39m (shapeXY) {\u001b[0m\n\u001b[0m \u001b[90m    | \u001b[39m                            \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 55 | \u001b[39m                    \u001b[36mif\u001b[39m (shapeXY \u001b[33m==\u001b[39m \u001b[35m1\u001b[39m \u001b[33m&&\u001b[39m boardXY \u001b[33m>\u001b[39m \u001b[35m0\u001b[39m) {\u001b[0m\n\u001b[0m \u001b[90m 56 | \u001b[39m                        currentHit \u001b[33m=\u001b[39m \u001b[36mtrue\u001b[39m\u001b[33m;\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 57 | \u001b[39m                    }\u001b[0m\n    at Parser._raise (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:742:17)\n    at Parser.raiseWithData (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:735:17)\n    at Parser.raise (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:729:17)\n    at Parser.unexpected (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:8757:16)\n    at Parser.expect (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:8743:28)\n    at Parser.parseFor (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11694:10)\n    at Parser.parseForStatement (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11422:17)\n    at Parser.parseStatementContent (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11106:21)\n    at Parser.parseStatement (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11081:17)\n    at Parser.parseBlockOrModuleBlockBody (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11656:25)\n    at Parser.parseBlockBody (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11642:10)\n    at Parser.parseBlock (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11626:10)\n    at Parser.parseStatementContent (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11157:21)\n    at Parser.parseStatement (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11081:17)\n    at Parser.parseIfStatement (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11434:51)\n    at Parser.parseStatementContent (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11126:21)\n    at Parser.parseStatement (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11081:17)\n    at Parser.parseBlockOrModuleBlockBody (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11656:25)\n    at Parser.parseBlockBody (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11642:10)\n    at Parser.parseBlock (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11626:10)\n    at Parser.parseStatementContent (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11157:21)\n    at Parser.parseStatement (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11081:17)\n    at /Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11699:60\n    at Parser.withTopicForbiddingContext (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:10956:14)\n    at Parser.parseFor (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11699:22)\n    at Parser.parseForStatement (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11422:17)\n    at Parser.parseStatementContent (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11106:21)\n    at Parser.parseStatement (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11081:17)\n    at Parser.parseBlockOrModuleBlockBody (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11656:25)\n    at Parser.parseBlockBody (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11642:10)\n    at Parser.parseBlock (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11626:10)\n    at Parser.parseStatementContent (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11157:21)\n    at Parser.parseStatement (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11081:17)\n    at /Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11699:60\n    at Parser.withTopicForbiddingContext (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:10956:14)\n    at Parser.parseFor (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11699:22)");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "arraySum", function() { return arraySum; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "testSides", function() { return testSides; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "testCorners", function() { return testCorners; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "testBoard", function() { return testBoard; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "updateBoard", function() { return updateBoard; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "renderBoard", function() { return renderBoard; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "playTurn", function() { return playTurn; });
+/* harmony import */ var _helpers_Data__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../helpers/Data */ "./assets/src/js/helpers/Data.js");
+
+var BOARD_WIDTH = 640;
+var BOARD_HEIGHT = 640;
+var BOARD_TOP = 96;
+var BOARD_LEFT = 96;
+var GRID_SIZE = 32;
+function arraySum(i) {
+  var sum = 0; // missing var added
+
+  for (var a = 0; a < i.length; a++) {
+    // missing var added
+    if (typeof i[a] == 'number') {
+      sum += i[a];
+    } else if (i[a] instanceof Array) {
+      sum += arraySum(i[a]);
+    }
+  }
+
+  return sum;
+}
+function testSides(state, playerIndex, boardX, boardY) {
+  var hit = false;
+  var team = playerIndex + 1;
+
+  if (boardY + 1 < (BOARD_HEIGHT + BOARD_TOP) / GRID_SIZE) {
+    if (state.board[boardY + 1][boardX] == team) {
+      hit = true;
+    }
+  }
+
+  if (boardY - 1 > 0) {
+    if (state.board[boardY - 1][boardX] == team) {
+      hit = true;
+    }
+  }
+
+  if (boardX + 1 < (BOARD_WIDTH + BOARD_LEFT) / GRID_SIZE) {
+    if (state.board[boardY][boardX + 1] == team) {
+      hit = true;
+    }
+  }
+
+  if (boardX - 1 > 0) {
+    if (state.board[boardY][boardX - 1] == team) {
+      hit = true;
+    }
+  }
+
+  return hit;
+}
+function testCorners(state, playerIndex, boardX, boardY) {
+  var miss = false;
+  var team = playerIndex + 1;
+  var topEdge = 0;
+  var leftEdge = 0;
+  var rightEdge = (BOARD_WIDTH + BOARD_LEFT) / GRID_SIZE;
+  var bottomEdge = (BOARD_HEIGHT + BOARD_TOP) / GRID_SIZE;
+
+  if (boardY + 1 < bottomEdge && boardX + 1 < rightEdge) {
+    if (state.board[boardY + 1][boardX + 1] == team) {
+      miss = true;
+    }
+  }
+
+  if (boardY + 1 < bottomEdge && boardX - 1 > leftEdge) {
+    if (state.board[boardY + 1][boardX - 1] == team) {
+      miss = true;
+    }
+  }
+
+  if (boardY - 1 > topEdge && boardX - 1 > leftEdge) {
+    if (state.board[boardY - 1][boardX - 1] == team) {
+      miss = true;
+    }
+  }
+
+  if (boardY - 1 > topEdge && boardX + 1 < rightEdge) {
+    if (state.board[boardY - 1][boardX + 1] == team) {
+      miss = true;
+    }
+  }
+
+  return miss;
+}
+function testBoard(state, hit, playerIndex, block) {
+  var currentHit = hit;
+  var boardX;
+  var boardY;
+  var positionX = 0;
+  var positionY = 0;
+
+  for (boardY = block.y; boardY < state.board.length && boardY < block.y + block.height; boardY++) {
+    positionX = 0;
+
+    for (boardX = block.x; boardX < state.board[boardY].length && boardX < block.x + block.width; boardX++) {
+      var shapeXY = block.shape[positionY][positionX];
+      var boardXY = state.board[boardY][boardX];
+
+      if (shapeXY == 1 && boardXY > 0) {
+        currentHit = true;
+      } else if (shapeXY == 1 && testSides(state, playerIndex, boardX, boardY)) {
+        currentHit = true;
+      } else if (state.players[playerIndex].turn != 0 && shapeXY == 1 && testCorners(state, playerIndex, boardX, boardY)) {
+        currentHit = true;
+      }
+
+      positionX++;
+    }
+
+    positionY++;
+  }
+
+  return currentHit;
+}
+function updateBoard(state, team, block) {
+  var currentState = state;
+  var boardX;
+  var boardY;
+  var positionX = 0;
+  var positionY = 0;
+  var hit = false;
+
+  for (boardY = block.y; boardY < currentState.board.length && boardY < block.y + block.height; boardY++) {
+    positionX = 0;
+
+    for (boardX = block.x; boardX < currentState.board[boardY].length && boardX < block.x + block.width; boardX++) {
+      var shapeXY = block.shape[positionY][positionX];
+      var boardXY = currentState.board[boardY][boardX];
+
+      if (shapeXY == 1 && boardXY == 0) {
+        currentState.board[boardY][boardX] = team;
+      }
+
+      positionX++;
+    }
+
+    positionY++;
+  }
+
+  return currentState;
+}
+function renderBoard(state) {
+  var boardX;
+  var boardY;
+  var row = '';
+
+  for (boardY = 0; boardY < state.board.length; boardY++) {
+    row = '';
+
+    for (boardX = 0; boardX < state.board[boardY].length; boardX++) {
+      row += "".concat(state.board[boardY][boardX], " ");
+    }
+
+    console.log(row);
+  }
+}
+function playTurn(state, playerIndex, blockIndex, x, y) {
+  var currentState = state;
+  var hit = false;
+  var shape = _helpers_Data__WEBPACK_IMPORTED_MODULE_0__["DataBlocks"][blockIndex];
+  var block = {
+    shape: shape,
+    x: Math.round((x - BOARD_LEFT) / GRID_SIZE),
+    y: Math.round((y - BOARD_TOP) / GRID_SIZE),
+    width: shape[0].length,
+    height: shape.length,
+    points: arraySum(shape)
+  };
+
+  if (block.x < 0 || block.y < 0) {
+    hit = true;
+  } else if (block.x + block.width > currentState.board.length || block.y + block.height > currentState.board[0].length) {
+    hit = true;
+  } else {
+    hit = testBoard(currentState, hit, playerIndex, block);
+  }
+
+  if (!hit) {
+    currentState.players[playerIndex].score += block.points;
+    currentState.players[playerIndex].turn++;
+    currentState.turn++;
+    currentState = updateBoard(currentState, playerIndex, block);
+    renderBoard(currentState);
+    return currentState;
+  } else {
+    throw 'Hit';
+  }
+}
 
 /***/ }),
 
@@ -170,37 +393,29 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var phaser__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! phaser */ "./node_modules/phaser/src/phaser.js");
 /* harmony import */ var phaser__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(phaser__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _scenes_Game__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./scenes/Game */ "./assets/src/js/scenes/Game.js");
-/* harmony import */ var _helpers_Logic__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./helpers/Logic */ "./assets/src/js/helpers/Logic.js");
-/* harmony import */ var _helpers_Data__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./helpers/Data */ "./assets/src/js/helpers/Data.js");
 
 
-
- // var config = {
-//     type: Phaser.AUTO,
-//     physics: {
-//         default: 'arcade',
-//         arcade: {
-//             debug: true,
-//             gravity: { y: 0 }
-//         }
-//     },
-//     scale: {
-//         mode: Phaser.Scale.FIT,
-//         parent: 'phaser-example',
-//         autoCenter: Phaser.Scale.CENTER_BOTH,
-//         width: 832,
-//         height: 832
-//     },
-//     scene: [Game]
-// };
-// const game = new Phaser.Game(config);
-
-var state = {
-  board: _helpers_Data__WEBPACK_IMPORTED_MODULE_3__["DataBoard"],
-  score: [0, 0, 0, 0]
+var config = {
+  type: phaser__WEBPACK_IMPORTED_MODULE_0___default.a.AUTO,
+  physics: {
+    "default": 'arcade',
+    arcade: {
+      debug: true,
+      gravity: {
+        y: 0
+      }
+    }
+  },
+  scale: {
+    mode: phaser__WEBPACK_IMPORTED_MODULE_0___default.a.Scale.FIT,
+    parent: 'phaser-example',
+    autoCenter: phaser__WEBPACK_IMPORTED_MODULE_0___default.a.Scale.CENTER_BOTH,
+    width: 832,
+    height: 832
+  },
+  scene: [_scenes_Game__WEBPACK_IMPORTED_MODULE_1__["default"]]
 };
-state = Object(_helpers_Logic__WEBPACK_IMPORTED_MODULE_2__["default"])(state, 1, 5, 896, 896);
-state = Object(_helpers_Logic__WEBPACK_IMPORTED_MODULE_2__["default"])(state, 2, 9, 992, 992);
+var game = new phaser__WEBPACK_IMPORTED_MODULE_0___default.a.Game(config);
 
 /***/ }),
 
@@ -217,9 +432,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! socket.io-client */ "./node_modules/socket.io-client/lib/index.js");
 /* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(socket_io_client__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _helpers_Data__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../helpers/Data */ "./assets/src/js/helpers/Data.js");
-/* harmony import */ var _components_Block__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../components/Block */ "./assets/src/js/components/Block.js");
-/* harmony import */ var _components_Board__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../components/Board */ "./assets/src/js/components/Board.js");
-/* harmony import */ var _components_Start__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../components/Start */ "./assets/src/js/components/Start.js");
+/* harmony import */ var _helpers_Logic__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../helpers/Logic */ "./assets/src/js/helpers/Logic.js");
+/* harmony import */ var _components_Block__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../components/Block */ "./assets/src/js/components/Block.js");
+/* harmony import */ var _components_Board__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../components/Board */ "./assets/src/js/components/Board.js");
+/* harmony import */ var _components_Start__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../components/Start */ "./assets/src/js/components/Start.js");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -241,6 +457,7 @@ function _assertThisInitialized(self) { if (self === void 0) { throw new Referen
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
 
 
 
@@ -275,31 +492,50 @@ var Game = /*#__PURE__*/function (_Phaser$Scene) {
     value: function create() {
       var self = this;
       this.socket = socket_io_client__WEBPACK_IMPORTED_MODULE_0___default()('http://localhost:3000');
-      this.isPlayerA = false;
-      this.boardState = _helpers_Data__WEBPACK_IMPORTED_MODULE_1__["DataBoard"];
-      this.board = new _components_Board__WEBPACK_IMPORTED_MODULE_3__["default"](this);
+      this.state = {};
+      this.board = new _components_Board__WEBPACK_IMPORTED_MODULE_4__["default"](this);
       this.renderBoard = this.board.renderBoard();
-      this.start = new _components_Start__WEBPACK_IMPORTED_MODULE_4__["default"](this);
-      this.renderStart = this.start.renderStart();
+      this.start = new _components_Start__WEBPACK_IMPORTED_MODULE_5__["default"](this);
+      this.startButton = this.start.renderStart();
+      this.scoreText = this.add.text(16, 16, '', {
+        fontSize: '18px',
+        fill: '#0000FF'
+      });
       this.socket.on('connect', function () {
         console.log('Connected!');
       });
-      this.socket.on('isPlayerA', function () {
-        console.log('isPlayerA');
-        self.isPlayerA = true;
-      });
-      this.socket.on('startGame', function () {
-        console.log('startGame!');
-        self.start.startGame();
-        self.renderStart.disableInteractive();
-      });
-      this.socket.on('blockPlayed', function (gameObject, isPlayerA, values) {
-        console.log('blockPlayed');
+      this.socket.on('currentPlayers', function (players) {
+        var id = players.findIndex(function (x) {
+          return x.id === self.socket.id;
+        });
 
-        if (isPlayerA !== self.isPlayerA) {
+        if (id > -1) {
+          self.player = players[id];
+          self.playerIndex = id;
+          console.log(players[id]);
+          console.log(id);
+        }
+      });
+      this.socket.on('startGame', function (state) {
+        console.log('startGame!');
+        self.state = state;
+        self.start.startGame(state);
+      });
+      this.socket.on('updateGameState', function (state, playerIndex, gameObject, values) {
+        console.log('updateGameState');
+        self.state = state;
+        var scoreString = '';
+
+        for (var i = 0; i < state.players.length; i++) {
+          scoreString = scoreString + "".concat(i, ": ").concat(state.players[i].score, ", ");
+        }
+
+        self.scoreText.setText(scoreString);
+
+        if (playerIndex !== self.playerIndex) {
           var sprite = gameObject.textureKey;
-          var block = new _components_Block__WEBPACK_IMPORTED_MODULE_2__["default"](self);
-          block.renderOpponent(gameObject.x, gameObject.y, values.index, sprite).disableInteractive();
+          var block = new _components_Block__WEBPACK_IMPORTED_MODULE_3__["default"](self);
+          block.renderOpponent(gameObject.x, gameObject.y, values.index, playerIndex, sprite).disableInteractive();
         }
       });
       this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
@@ -316,15 +552,14 @@ var Game = /*#__PURE__*/function (_Phaser$Scene) {
           values = gameObject.data.values;
         }
 
-        gameObject.setData({
-          played: true
-        });
-        gameObject.disableInteractive();
-        self.socket.emit('blockPlayed', gameObject, self.isPlayerA, values);
-      }); //     gameObject.x = Phaser.Math.Snap.To(gameObject.input.dragStartX);
-      //     gameObject.y = Phaser.Math.Snap.To(gameObject.input.dragStartY);
-      //     // dropZone.data.values.cards++;
-      //     // gameObject.x = dropZone.x - 350 + dropZone.data.values.cards * 50;
+        try {
+          self.state = Object(_helpers_Logic__WEBPACK_IMPORTED_MODULE_2__["playTurn"])(self.state, self.playerIndex, values.index, gameObject.x, gameObject.y);
+          self.socket.emit('updateGameState', self.state, self.playerIndex, gameObject, values);
+          gameObject.disableInteractive();
+        } catch (e) {
+          console.log(e);
+        }
+      });
     }
   }, {
     key: "update",

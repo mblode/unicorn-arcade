@@ -4,8 +4,11 @@ var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var path = require('path');
 
-let players = [];
-let board = [];
+let state = {
+    board: [],
+    players: [],
+    turn: 0,
+};
 
 app.use(express.static(path.join(__dirname, '../client')));
 
@@ -16,28 +19,41 @@ app.get('/', (req, res) => {
 io.on('connection', function (socket) {
     console.log('A user connected: ' + socket.id);
 
-    players.push(socket.id);
-
-    if (players.length === 1) {
-        io.emit('isPlayerA');
-    }
-
-    socket.on('startGame', function () {
-        io.emit('startGame');
+    state.players.push({
+        id: socket.id,
+        score: 0,
+        turn: 0,
     });
 
-    socket.on('blockPlayed', function (gameObject, isPlayerA, values) {
-        io.emit('blockPlayed', gameObject, isPlayerA, values);
+    console.log(state.players);
+
+    // send the players object to the new player
+    socket.emit('currentPlayers', state.players);
+
+    socket.broadcast.emit('newPlayer', state.players);
+
+    socket.on('startGame', function (board) {
+        state.board = board;
+        io.emit('startGame', state);
     });
 
+    socket.on('updateGameState', function (newState, playerIndex, gameObject, values) {
+        state = newState;
+        io.emit('updateGameState', state, playerIndex, gameObject, values);
+    });
+
+    // when a player disconnects, remove them from our players object
     socket.on('disconnect', function () {
-        console.log('A user disconnected: ' + socket.id);
-        players = players.filter((player) => player !== socket.id);
-    });
+        console.log('user disconnected: ' + socket.id);
 
-    // when a player moves, update the player data
-    socket.on('playerTurn', function (gameObject) {
-        socket.broadcast.emit('playerMoved', gameObject, state.players[socket.id]);
+        state.players = state.players.filter((x) => {
+            return x.id != socket.id;
+        });
+
+        console.log(state.players);
+
+        // emit a message to all players to remove this player
+        io.emit('disconnect', socket.id);
     });
 
     socket.on('error', function () {

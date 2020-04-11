@@ -272,14 +272,17 @@ function testCorners(state, playerIndex, boardX, boardY) {
     }
   }
 
+  console.log(miss);
   return miss;
 }
 function testBoard(state, hit, playerIndex, block) {
   var currentHit = hit;
+  var miss = false;
   var boardX;
   var boardY;
   var positionX = 0;
   var positionY = 0;
+  console.log('Turn: ' + state.players[playerIndex].turn);
 
   for (boardY = block.y; boardY < state.board.length && boardY < block.y + block.height; boardY++) {
     positionX = 0;
@@ -292,8 +295,10 @@ function testBoard(state, hit, playerIndex, block) {
         currentHit = true;
       } else if (shapeXY == 1 && testSides(state, playerIndex, boardX, boardY)) {
         currentHit = true;
-      } else if (state.players[playerIndex].turn != 0 && shapeXY == 1 && testCorners(state, playerIndex, boardX, boardY)) {
-        currentHit = true;
+      }
+
+      if (state.players[playerIndex].turn != 0 && shapeXY == 1 && testCorners(state, playerIndex, boardX, boardY)) {
+        miss = true;
       }
 
       positionX++;
@@ -302,15 +307,20 @@ function testBoard(state, hit, playerIndex, block) {
     positionY++;
   }
 
+  if (!miss) {
+    currentHit = true;
+  }
+
+  console.log(miss);
   return currentHit;
 }
-function updateBoard(state, team, block) {
+function updateBoard(state, playerIndex, block) {
   var currentState = state;
+  var team = playerIndex + 1;
   var boardX;
   var boardY;
   var positionX = 0;
   var positionY = 0;
-  var hit = false;
 
   for (boardY = block.y; boardY < currentState.board.length && boardY < block.y + block.height; boardY++) {
     positionX = 0;

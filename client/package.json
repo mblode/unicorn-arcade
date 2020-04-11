@@ -1,0 +1,29 @@
+{
+    "name": "unicorn-client",
+    "version": "1.0.0",
+    "private": true,
+    "description": "Board Game prototype for Unicorn Arcade",
+    "main": "index.js",
+    "scripts": {
+        "start": "npm run development",
+        "dev": "npm run development",
+        "development": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js || true",
+        "watch": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js || true",
+        "watch-poll": "npm run watch -- --watch-poll || true",
+        "hot": "cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --disable-host-check --config=node_modules/laravel-mix/setup/webpack.config.js || true",
+        "prod": "npm run production || true",
+        "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js || true"
+    },
+    "license": "MIT",
+    "devDependencies": {
+        "copy-webpack-plugin": "^5.1.1",
+        "cross-env": "^7.0.2",
+        "laravel-mix": "^5.0.4",
+        "postcss-preset-env": "^6.7.0",
+        "vue-template-compiler": "^2.6.11"
+    },
+    "dependencies": {
+        "phaser": "^3.22.0",
+        "socket.io-client": "^2.3.0"
+    }
+}

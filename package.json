@@ -3,10 +3,10 @@
     "version": "1.0.0",
     "private": true,
     "description": "Board Game prototype for Unicorn Arcade",
-    "main": "index.js",
+    "main": "server/index.js",
     "scripts": {
-        "start": "node index.js",
-        "dev": "nodemon index.js",
+        "start": "node server/index.js",
+        "dev": "nodemon server/index.js",
         "watch": "npm run dev",
         "stop": "lsof -ti :3000 | xargs kill",
         "heroku-postbuild": "cd client && npm install && npm run build"

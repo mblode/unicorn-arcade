@@ -120,8 +120,7 @@ var Start = function Start(scene) {
   this.renderStart = function () {
     var start = scene.add.text(400, 30, ['Start Game']).setFontSize(18).setColor('#333333').setInteractive();
     start.on('pointerdown', function () {
-      console.log('startGame!');
-      scene.socket.emit('startGame', _helpers_Data__WEBPACK_IMPORTED_MODULE_1__["DataBoard"]);
+      scene.socket.emit('join');
     });
     start.on('pointerover', function () {
       start.setColor('#111111');
@@ -177,7 +176,7 @@ var DataBlocks = [[[1]], [[1, 1]], [[1, 1], [0, 1]], [[1, 1, 1]], [[1, 1], [1, 1
 /*!****************************************!*\
   !*** ./assets/src/js/helpers/Logic.js ***!
   \****************************************/
-/*! exports provided: arraySum, testSides, testCorners, testBoard, updateBoard, renderBoard, playTurn */
+/*! exports provided: arraySum, testSides, testCorners, testEdges, testBoard, updateBoard, renderBoard, playTurn */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -185,6 +184,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "arraySum", function() { return arraySum; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "testSides", function() { return testSides; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "testCorners", function() { return testCorners; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "testEdges", function() { return testEdges; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "testBoard", function() { return testBoard; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "updateBoard", function() { return updateBoard; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "renderBoard", function() { return renderBoard; });
@@ -197,10 +197,9 @@ var BOARD_TOP = 96;
 var BOARD_LEFT = 96;
 var GRID_SIZE = 32;
 function arraySum(i) {
-  var sum = 0; // missing var added
+  var sum = 0;
 
   for (var a = 0; a < i.length; a++) {
-    // missing var added
     if (typeof i[a] == 'number') {
       sum += i[a];
     } else if (i[a] instanceof Array) {
@@ -238,6 +237,7 @@ function testSides(state, playerIndex, boardX, boardY) {
     }
   }
 
+  console.log('Hit: ' + hit);
   return hit;
 }
 function testCorners(state, playerIndex, boardX, boardY) {
@@ -245,8 +245,8 @@ function testCorners(state, playerIndex, boardX, boardY) {
   var team = playerIndex + 1;
   var topEdge = 0;
   var leftEdge = 0;
-  var rightEdge = (BOARD_WIDTH + BOARD_LEFT) / GRID_SIZE;
-  var bottomEdge = (BOARD_HEIGHT + BOARD_TOP) / GRID_SIZE;
+  var rightEdge = BOARD_WIDTH / GRID_SIZE - 1;
+  var bottomEdge = BOARD_HEIGHT / GRID_SIZE - 1;
 
   if (boardY + 1 < bottomEdge && boardX + 1 < rightEdge) {
     if (state.board[boardY + 1][boardX + 1] == team) {
@@ -272,8 +272,35 @@ function testCorners(state, playerIndex, boardX, boardY) {
     }
   }
 
-  console.log(miss);
+  console.log('Miss: ' + miss);
   return miss;
+}
+function testEdges(boardX, boardY) {
+  var onEdge = false;
+  var topEdge = 0;
+  var leftEdge = 0;
+  var rightEdge = BOARD_WIDTH / GRID_SIZE - 1;
+  var bottomEdge = BOARD_HEIGHT / GRID_SIZE - 1;
+
+  if (boardY == bottomEdge && boardX == rightEdge) {
+    onEdge = true;
+  }
+
+  if (boardY == bottomEdge && boardX == leftEdge) {
+    onEdge = true;
+  }
+
+  if (boardY == topEdge && boardX == leftEdge) {
+    onEdge = true;
+  }
+
+  if (boardY == topEdge && boardX == rightEdge) {
+    onEdge = true;
+  }
+
+  console.log(boardX, boardY, topEdge, leftEdge, rightEdge, bottomEdge);
+  console.log('On Edge: ' + onEdge);
+  return onEdge;
 }
 function testBoard(state, hit, playerIndex, block) {
   var currentHit = hit;
@@ -282,23 +309,40 @@ function testBoard(state, hit, playerIndex, block) {
   var boardY;
   var positionX = 0;
   var positionY = 0;
-  console.log('Turn: ' + state.players[playerIndex].turn);
+  console.log('Turn: ' + state.players[playerIndex].turnCount);
 
   for (boardY = block.y; boardY < state.board.length && boardY < block.y + block.height; boardY++) {
     positionX = 0;
+
+    if (currentHit) {
+      break;
+    }
 
     for (boardX = block.x; boardX < state.board[boardY].length && boardX < block.x + block.width; boardX++) {
       var shapeXY = block.shape[positionY][positionX];
       var boardXY = state.board[boardY][boardX];
 
-      if (shapeXY == 1 && boardXY > 0) {
-        currentHit = true;
-      } else if (shapeXY == 1 && testSides(state, playerIndex, boardX, boardY)) {
-        currentHit = true;
-      }
-
-      if (state.players[playerIndex].turn != 0 && shapeXY == 1 && testCorners(state, playerIndex, boardX, boardY)) {
-        miss = true;
+      if (shapeXY == 1) {
+        if (state.players[playerIndex].turnCount <= 0) {
+          if (testEdges(boardX, boardY)) {
+            miss = true;
+            break;
+          }
+        } else {
+          if (boardXY > 0) {
+            currentHit = true;
+            console.log(2);
+            break;
+          } else if (testCorners(state, playerIndex, boardX, boardY)) {
+            miss = true;
+            console.log(3);
+            break;
+          } else if (testSides(state, playerIndex, boardX, boardY)) {
+            currentHit = true;
+            console.log(4);
+            break;
+          }
+        }
       }
 
       positionX++;
@@ -311,7 +355,6 @@ function testBoard(state, hit, playerIndex, block) {
     currentHit = true;
   }
 
-  console.log(miss);
   return currentHit;
 }
 function updateBoard(state, playerIndex, block) {
@@ -356,14 +399,15 @@ function renderBoard(state) {
     console.log(row);
   }
 }
-function playTurn(state, playerIndex, blockIndex, x, y) {
+function playTurn(state, playerIndex, blockIndex, gameObject) {
   var currentState = state;
   var hit = false;
   var shape = _helpers_Data__WEBPACK_IMPORTED_MODULE_0__["DataBlocks"][blockIndex];
   var block = {
     shape: shape,
-    x: Math.round((x - BOARD_LEFT) / GRID_SIZE),
-    y: Math.round((y - BOARD_TOP) / GRID_SIZE),
+    x: Math.round((gameObject.x - BOARD_LEFT) / GRID_SIZE),
+    y: Math.round((gameObject.y - BOARD_TOP) / GRID_SIZE),
+    rotation: Math.round(gameObject.rotation),
     width: shape[0].length,
     height: shape.length,
     points: arraySum(shape)
@@ -371,16 +415,19 @@ function playTurn(state, playerIndex, blockIndex, x, y) {
 
   if (block.x < 0 || block.y < 0) {
     hit = true;
+    console.log(1);
   } else if (block.x + block.width > currentState.board.length || block.y + block.height > currentState.board[0].length) {
     hit = true;
+    console.log(2);
   } else {
     hit = testBoard(currentState, hit, playerIndex, block);
+    console.log(3);
   }
 
   if (!hit) {
     currentState.players[playerIndex].score += block.points;
-    currentState.players[playerIndex].turn++;
-    currentState.turn++;
+    currentState.players[playerIndex].turnCount++;
+    currentState.turnCount++;
     currentState = updateBoard(currentState, playerIndex, block);
     renderBoard(currentState);
     return currentState;
@@ -502,6 +549,8 @@ var Game = /*#__PURE__*/function (_Phaser$Scene) {
     value: function create() {
       var self = this;
       this.socket = socket_io_client__WEBPACK_IMPORTED_MODULE_0___default()('http://localhost:3000');
+      this.cursors = this.input.keyboard;
+      this.currentBlock = null;
       this.state = {};
       this.board = new _components_Board__WEBPACK_IMPORTED_MODULE_4__["default"](this);
       this.renderBoard = this.board.renderBoard();
@@ -513,40 +562,36 @@ var Game = /*#__PURE__*/function (_Phaser$Scene) {
       });
       this.socket.on('connect', function () {
         console.log('Connected!');
-      });
-      this.socket.on('currentPlayers', function (players) {
-        var id = players.findIndex(function (x) {
+      }); // this.socket.on('join', function(payload) {
+      //     console.log('join');
+      // });
+
+      this.socket.on('startGame', function (payload) {
+        var id = payload.players.findIndex(function (x) {
           return x.id === self.socket.id;
         });
 
         if (id > -1) {
-          self.player = players[id];
+          self.player = payload.players[id];
           self.playerIndex = id;
-          console.log(players[id]);
-          console.log(id);
         }
+
+        self.state = payload;
+        self.start.startGame(payload);
       });
-      this.socket.on('startGame', function (state) {
-        console.log('startGame!');
-        self.state = state;
-        self.start.startGame(state);
-      });
-      this.socket.on('updateGameState', function (state, playerIndex, gameObject, values) {
-        console.log('updateGameState');
-        self.state = state;
+      this.socket.on('updateGameState', function (payload) {
+        self.state = payload.state;
         var scoreString = '';
 
-        for (var i = 0; i < state.players.length; i++) {
-          scoreString = scoreString + "".concat(i, ": ").concat(state.players[i].score, ", ");
+        for (var i = 0; i < payload.state.players.length; i++) {
+          scoreString = scoreString + "".concat(i, ": ").concat(payload.state.players[i].score, ", ");
         }
 
-        self.scoreText.setText(scoreString);
+        self.scoreText.setText(scoreString); // if (playerIndex !== self.playerIndex) {
 
-        if (playerIndex !== self.playerIndex) {
-          var sprite = gameObject.textureKey;
-          var block = new _components_Block__WEBPACK_IMPORTED_MODULE_3__["default"](self);
-          block.renderOpponent(gameObject.x, gameObject.y, values.index, playerIndex, sprite).disableInteractive();
-        }
+        var sprite = payload.gameObject.textureKey;
+        var block = new _components_Block__WEBPACK_IMPORTED_MODULE_3__["default"](self);
+        block.renderOpponent(payload.gameObject.x, payload.gameObject.y, payload.gameObject.rotation, payload.values.index, self.playerIndex, sprite).disableInteractive(); // }
       });
       this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
         gameObject.x = Phaser.Math.Snap.To(dragX, 32);
@@ -554,8 +599,10 @@ var Game = /*#__PURE__*/function (_Phaser$Scene) {
       });
       this.input.on('dragstart', function (pointer, gameObject) {
         self.children.bringToTop(gameObject);
+        this.currentBlock = gameObject;
       });
       this.input.on('dragend', function (pointer, gameObject, dropped) {
+        this.currentBlock = null;
         var values = null;
 
         if (gameObject.data.values != undefined) {
@@ -563,8 +610,14 @@ var Game = /*#__PURE__*/function (_Phaser$Scene) {
         }
 
         try {
-          self.state = Object(_helpers_Logic__WEBPACK_IMPORTED_MODULE_2__["playTurn"])(self.state, self.playerIndex, values.index, gameObject.x, gameObject.y);
-          self.socket.emit('updateGameState', self.state, self.playerIndex, gameObject, values);
+          self.state = Object(_helpers_Logic__WEBPACK_IMPORTED_MODULE_2__["playTurn"])(self.state, self.playerIndex, values.index, gameObject);
+          var payload = {
+            roomIndex: 0,
+            state: self.state,
+            gameObject: gameObject,
+            values: values
+          };
+          self.socket.emit('updateGameState', payload);
           gameObject.disableInteractive();
         } catch (e) {
           console.log(e);
@@ -573,7 +626,26 @@ var Game = /*#__PURE__*/function (_Phaser$Scene) {
     }
   }, {
     key: "update",
-    value: function update() {}
+    value: function update() {
+      var a = this.cursors.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+      var d = this.cursors.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+      var left = this.cursors.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
+      var right = this.cursors.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
+
+      if (this.currentBlock) {
+        console.log(this.currentBlock);
+
+        if (Phaser.Input.Keyboard.JustDown(a) || Phaser.Input.Keyboard.JustDown(left)) {
+          console.log('Left');
+          this.currentBlock.angle -= 90;
+        }
+
+        if (Phaser.Input.Keyboard.JustDown(d) || Phaser.Input.Keyboard.JustDown(right)) {
+          console.log('Right');
+          this.currentBlock.angle += 90;
+        }
+      }
+    }
   }]);
 
   return Game;

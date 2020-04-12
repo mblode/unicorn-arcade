@@ -1,5 +1,5 @@
 import Block from './Block';
-import { DataBoard, DataBlocks } from '../helpers/Data';
+import { DataBlocks } from '../helpers/Data';
 
 export default class Start {
     constructor(scene) {
@@ -11,8 +11,7 @@ export default class Start {
                 .setInteractive();
 
             start.on('pointerdown', function() {
-                console.log('startGame!');
-                scene.socket.emit('startGame', DataBoard);
+                scene.socket.emit('join');
             });
 
             start.on('pointerover', function() {

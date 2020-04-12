@@ -3,12 +3,9 @@ var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var path = require('path');
+var Game = require('./classes/Game');
 
-let state = {
-    board: [],
-    players: [],
-    turn: 0,
-};
+var rooms = [];
 
 app.use(express.static(path.join(__dirname, '../client')));
 
@@ -19,46 +16,65 @@ app.get('/', (req, res) => {
 io.on('connection', function (socket) {
     console.log('A user connected: ' + socket.id);
 
-    state.players.push({
-        id: socket.id,
-        score: 0,
-        turn: 0,
+    socket.on('join', function (data) {
+        var game;
+
+        if (rooms.length === 0 || !rooms[rooms.length - 1].isWaiting()) {
+            game = new Game();
+            rooms.push(game);
+        } else {
+            game = rooms[rooms.length - 1];
+        }
+
+        game.addPlayer(socket);
+
+        // if (game.getNumPlayers() == 4) {
+        // game.startGame();
+
+        console.log(game.state);
+        io.emit('startGame', game.state);
+        // }
     });
 
-    console.log(state.players);
+    socket.on('updateGameState', function (payload) {
+        var game = rooms[payload.roomIndex];
 
-    // send the players object to the new player
-    socket.emit('currentPlayers', state.players);
+        game.state = payload.state;
 
-    socket.broadcast.emit('newPlayer', state.players);
-
-    socket.on('startGame', function (board) {
-        state.board = board;
-        io.emit('startGame', state);
+        io.emit('updateGameState', payload);
     });
 
-    socket.on('updateGameState', function (newState, playerIndex, gameObject, values) {
-        state = newState;
-        io.emit('updateGameState', state, playerIndex, gameObject, values);
-    });
-
-    // when a player disconnects, remove them from our players object
     socket.on('disconnect', function () {
         console.log('user disconnected: ' + socket.id);
-
-        state.players = state.players.filter((x) => {
-            return x.id != socket.id;
-        });
-
-        console.log(state.players);
-
-        // emit a message to all players to remove this player
-        io.emit('disconnect', socket.id);
     });
 
-    socket.on('error', function () {
+    socket.on('error', function (error) {
+        console.log(socket.id + ' error ' + error);
         socket.socket.reconnect();
     });
+});
+
+app.get('/rooms', function (req, res) {
+    var content = '';
+    content += '<h1>Latest Rooms</h1>';
+    content += '<ul>';
+
+    for (var i = rooms.length - 1; i >= 0; i--) {
+        content += '<li>Num. players: ' + rooms[i].getNumPlayers() + '; Status: ' + rooms[i].status + '</li>';
+    }
+    content += '</ul>';
+
+    res.send(content);
+});
+
+app.get('/rooms/:id', function (req, res) {
+    if (typeof rooms[req.params.id] != 'undefined') {
+        var game = rooms[req.params.id];
+
+        res.send('Num. players: ' + game.getNumPlayers() + '; Status: ' + game.status);
+    } else {
+        res.send("The game doesn't exists");
+    }
 });
 
 server.listen(3000, function () {

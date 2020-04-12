@@ -24,6 +24,8 @@ export default class Game extends Phaser.Scene {
         let self = this;
 
         this.socket = io('http://localhost:3000');
+        this.cursors = this.input.keyboard;
+        this.currentBlock = null;
 
         this.state = {};
 
@@ -39,44 +41,47 @@ export default class Game extends Phaser.Scene {
             console.log('Connected!');
         });
 
-        this.socket.on('currentPlayers', function(players) {
-            let id = players.findIndex(x => x.id === self.socket.id);
+        // this.socket.on('join', function(payload) {
+        //     console.log('join');
+        // });
+
+        this.socket.on('startGame', function(payload) {
+            let id = payload.players.findIndex(x => x.id === self.socket.id);
 
             if (id > -1) {
-                self.player = players[id];
+                self.player = payload.players[id];
                 self.playerIndex = id;
-
-                console.log(players[id]);
-                console.log(id);
             }
+
+            self.state = payload;
+            self.start.startGame(payload);
         });
 
-        this.socket.on('startGame', function(state) {
-            console.log('startGame!');
-
-            self.state = state;
-            self.start.startGame(state);
-        });
-
-        this.socket.on('updateGameState', function(state, playerIndex, gameObject, values) {
-            console.log('updateGameState');
-            self.state = state;
+        this.socket.on('updateGameState', function(payload) {
+            self.state = payload.state;
 
             let scoreString = '';
 
-            for (let i = 0; i < state.players.length; i++) {
-                scoreString = scoreString + `${i}: ${state.players[i].score}, `;
+            for (let i = 0; i < payload.state.players.length; i++) {
+                scoreString = scoreString + `${i}: ${payload.state.players[i].score}, `;
             }
 
             self.scoreText.setText(scoreString);
 
-            if (playerIndex !== self.playerIndex) {
-                let sprite = gameObject.textureKey;
-                let block = new Block(self);
-                block
-                    .renderOpponent(gameObject.x, gameObject.y, values.index, playerIndex, sprite)
-                    .disableInteractive();
-            }
+            // if (playerIndex !== self.playerIndex) {
+            let sprite = payload.gameObject.textureKey;
+            let block = new Block(self);
+            block
+                .renderOpponent(
+                    payload.gameObject.x,
+                    payload.gameObject.y,
+                    payload.gameObject.rotation,
+                    payload.values.index,
+                    self.playerIndex,
+                    sprite
+                )
+                .disableInteractive();
+            // }
         });
 
         this.input.on('drag', function(pointer, gameObject, dragX, dragY) {
@@ -86,9 +91,11 @@ export default class Game extends Phaser.Scene {
 
         this.input.on('dragstart', function(pointer, gameObject) {
             self.children.bringToTop(gameObject);
+            this.currentBlock = gameObject;
         });
 
         this.input.on('dragend', function(pointer, gameObject, dropped) {
+            this.currentBlock = null;
             let values = null;
 
             if (gameObject.data.values != undefined) {
@@ -96,8 +103,16 @@ export default class Game extends Phaser.Scene {
             }
 
             try {
-                self.state = playTurn(self.state, self.playerIndex, values.index, gameObject.x, gameObject.y);
-                self.socket.emit('updateGameState', self.state, self.playerIndex, gameObject, values);
+                self.state = playTurn(self.state, self.playerIndex, values.index, gameObject);
+
+                const payload = {
+                    roomIndex: 0,
+                    state: self.state,
+                    gameObject: gameObject,
+                    values: values
+                };
+
+                self.socket.emit('updateGameState', payload);
                 gameObject.disableInteractive();
             } catch (e) {
                 console.log(e);
@@ -105,5 +120,24 @@ export default class Game extends Phaser.Scene {
         });
     }
 
-    update() {}
+    update() {
+        let a = this.cursors.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+        let d = this.cursors.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+        let left = this.cursors.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
+        let right = this.cursors.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
+
+        if (this.currentBlock) {
+            console.log(this.currentBlock);
+
+            if (Phaser.Input.Keyboard.JustDown(a) || Phaser.Input.Keyboard.JustDown(left)) {
+                console.log('Left');
+                this.currentBlock.angle -= 90;
+            }
+
+            if (Phaser.Input.Keyboard.JustDown(d) || Phaser.Input.Keyboard.JustDown(right)) {
+                console.log('Right');
+                this.currentBlock.angle += 90;
+            }
+        }
+    }
 }

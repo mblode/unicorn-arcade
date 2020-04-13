@@ -1,6 +1,6 @@
 import io from 'socket.io-client';
 import { DataBlocks } from '../helpers/Data';
-import { playTurn } from '../helpers/Logic';
+import { playTurn, getNewShape } from '../helpers/Logic';
 import Block from '../components/Block';
 import Board from '../components/Board';
 import Start from '../components/Start';
@@ -15,7 +15,7 @@ export default class Game extends Phaser.Scene {
     preload() {
         this.load.image('grid', 'assets/src/img/grid.png');
 
-        for (var i = 1; i <= DataBlocks.length; i++) {
+        for (var i = 0; i < DataBlocks.length; i++) {
             this.load.image(`block-${i}`, `assets/src/img/blocks/${i}.png`);
         }
     }
@@ -41,9 +41,9 @@ export default class Game extends Phaser.Scene {
             console.log('Connected!');
         });
 
-        // this.socket.on('join', function(payload) {
-        //     console.log('join');
-        // });
+        this.socket.on('join', function(payload) {
+            console.log('Joined!');
+        });
 
         this.socket.on('startGame', function(payload) {
             let id = payload.players.findIndex(x => x.id === self.socket.id);
@@ -68,20 +68,20 @@ export default class Game extends Phaser.Scene {
 
             self.scoreText.setText(scoreString);
 
-            // if (playerIndex !== self.playerIndex) {
-            let sprite = payload.gameObject.textureKey;
-            let block = new Block(self);
-            block
-                .renderOpponent(
-                    payload.gameObject.x,
-                    payload.gameObject.y,
-                    payload.gameObject.rotation,
-                    payload.values.index,
-                    self.playerIndex,
-                    sprite
-                )
-                .disableInteractive();
-            // }
+            if (payload.playerIndex !== self.playerIndex) {
+                let sprite = payload.gameObject.textureKey;
+                let block = new Block(self);
+                block
+                    .renderOpponent(
+                        payload.gameObject.x,
+                        payload.gameObject.y,
+                        payload.gameObject.rotation,
+                        payload.values.index,
+                        self.playerIndex,
+                        sprite
+                    )
+                    .disableInteractive();
+            }
         });
 
         this.input.on('drag', function(pointer, gameObject, dragX, dragY) {
@@ -91,11 +91,11 @@ export default class Game extends Phaser.Scene {
 
         this.input.on('dragstart', function(pointer, gameObject) {
             self.children.bringToTop(gameObject);
-            this.currentBlock = gameObject;
+            self.currentBlock = gameObject;
         });
 
         this.input.on('dragend', function(pointer, gameObject, dropped) {
-            this.currentBlock = null;
+            self.currentBlock = null;
             let values = null;
 
             if (gameObject.data.values != undefined) {
@@ -103,10 +103,11 @@ export default class Game extends Phaser.Scene {
             }
 
             try {
-                self.state = playTurn(self.state, self.playerIndex, values.index, gameObject);
+                self.state = playTurn(self.state, self.playerIndex, gameObject);
 
                 const payload = {
                     roomIndex: 0,
+                    playerIndex: self.playerIndex,
                     state: self.state,
                     gameObject: gameObject,
                     values: values
@@ -127,16 +128,58 @@ export default class Game extends Phaser.Scene {
         let right = this.cursors.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
 
         if (this.currentBlock) {
-            console.log(this.currentBlock);
-
             if (Phaser.Input.Keyboard.JustDown(a) || Phaser.Input.Keyboard.JustDown(left)) {
                 console.log('Left');
                 this.currentBlock.angle -= 90;
+
+                let newShape = getNewShape(this.currentBlock);
+                this.currentBlock.setData({ shape: newShape });
+
+                console.log(newShape);
+
+                let width = newShape[0].length;
+                let height = newShape.length;
+
+                if (width % 2 == 0 && height % 2 == 0) {
+                    console.log('width even and height even');
+                } else if (width % 2 > 0 && height % 2 == 0) {
+                    this.currentBlock.x -= 16;
+                    console.log('width odd and height even');
+                } else if (width % 2 == 0 && height % 2 > 0) {
+                    this.currentBlock.y -= 16;
+                    console.log('width even and height odd');
+                } else {
+                    this.currentBlock.x -= 16;
+                    this.currentBlock.y -= 16;
+                    console.log('width odd and height odd');
+                }
             }
 
             if (Phaser.Input.Keyboard.JustDown(d) || Phaser.Input.Keyboard.JustDown(right)) {
                 console.log('Right');
                 this.currentBlock.angle += 90;
+
+                let newShape = getNewShape(this.currentBlock);
+                this.currentBlock.setData({ shape: newShape });
+
+                let width = newShape[0].length;
+                let height = newShape.length;
+
+                console.log(newShape);
+
+                if (width % 2 == 0 && height % 2 == 0) {
+                    console.log('width even and height even');
+                } else if (width % 2 > 0 && height % 2 == 0) {
+                    this.currentBlock.x -= 16;
+                    console.log('width odd and height even');
+                } else if (width % 2 == 0 && height % 2 > 0) {
+                    this.currentBlock.y -= 16;
+                    console.log('width even and height odd');
+                } else {
+                    this.currentBlock.x -= 16;
+                    this.currentBlock.y -= 16;
+                    console.log('width odd and height odd');
+                }
             }
         }
     }

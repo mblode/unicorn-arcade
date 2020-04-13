@@ -31,7 +31,6 @@ io.on('connection', function (socket) {
         // if (game.getNumPlayers() == 4) {
         // game.startGame();
 
-        console.log(game.state);
         io.emit('startGame', game.state);
         // }
     });

@@ -11,7 +11,9 @@
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Block; });
 /* harmony import */ var _helpers_Data__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../helpers/Data */ "./assets/src/js/helpers/Data.js");
+/* harmony import */ var _helpers_Logic__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../helpers/Logic */ "./assets/src/js/helpers/Logic.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 
 
 
@@ -19,14 +21,19 @@ var Block = function Block(scene) {
   _classCallCheck(this, Block);
 
   this.renderPlayer = function (blockIndex, playerIndex) {
-    var block = scene.physics.add.sprite(0, 400, "block-".concat(blockIndex)).setOrigin(0, 0).setInteractive();
+    var leftMargin = 1;
+
+    for (var i = 0; i < blockIndex; i++) {
+      leftMargin += _helpers_Data__WEBPACK_IMPORTED_MODULE_0__["DataBlocks"][i][0].length + 1;
+    }
+
+    var block = scene.physics.add.sprite(leftMargin * 32, 736, "block-".concat(blockIndex)).setInteractive().setOrigin(0.5, 0.5);
     scene.input.setDraggable(block);
     block.setData({
       shape: _helpers_Data__WEBPACK_IMPORTED_MODULE_0__["DataBlocks"][blockIndex],
       played: false,
       index: blockIndex
     });
-    console.log(playerIndex);
 
     if (playerIndex == 0) {
       block.setTint(0x0000ff);
@@ -42,7 +49,6 @@ var Block = function Block(scene) {
   };
 
   this.renderOpponent = function (x, y, blockIndex, playerIndex, sprite) {
-    console.log('renderOpponent');
     var block = scene.physics.add.sprite(x, y, sprite).setOrigin(0, 0);
     block.setData({
       shape: _helpers_Data__WEBPACK_IMPORTED_MODULE_0__["DataBlocks"][blockIndex],
@@ -176,18 +182,13 @@ var DataBlocks = [[[1]], [[1, 1]], [[1, 1], [0, 1]], [[1, 1, 1]], [[1, 1], [1, 1
 /*!****************************************!*\
   !*** ./assets/src/js/helpers/Logic.js ***!
   \****************************************/
-/*! exports provided: arraySum, testSides, testCorners, testEdges, testBoard, updateBoard, renderBoard, playTurn */
+/*! exports provided: renderBoard, getNewShape, playTurn */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "arraySum", function() { return arraySum; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "testSides", function() { return testSides; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "testCorners", function() { return testCorners; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "testEdges", function() { return testEdges; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "testBoard", function() { return testBoard; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "updateBoard", function() { return updateBoard; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "renderBoard", function() { return renderBoard; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getNewShape", function() { return getNewShape; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "playTurn", function() { return playTurn; });
 /* harmony import */ var _helpers_Data__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../helpers/Data */ "./assets/src/js/helpers/Data.js");
 
@@ -196,6 +197,8 @@ var BOARD_HEIGHT = 640;
 var BOARD_TOP = 96;
 var BOARD_LEFT = 96;
 var GRID_SIZE = 32;
+var TURN_DEGREE = 90;
+
 function arraySum(i) {
   var sum = 0;
 
@@ -209,6 +212,7 @@ function arraySum(i) {
 
   return sum;
 }
+
 function testSides(state, playerIndex, boardX, boardY) {
   var hit = false;
   var team = playerIndex + 1;
@@ -237,9 +241,9 @@ function testSides(state, playerIndex, boardX, boardY) {
     }
   }
 
-  console.log('Hit: ' + hit);
   return hit;
 }
+
 function testCorners(state, playerIndex, boardX, boardY) {
   var miss = false;
   var team = playerIndex + 1;
@@ -272,9 +276,9 @@ function testCorners(state, playerIndex, boardX, boardY) {
     }
   }
 
-  console.log('Miss: ' + miss);
   return miss;
 }
+
 function testEdges(boardX, boardY) {
   var onEdge = false;
   var topEdge = 0;
@@ -298,10 +302,9 @@ function testEdges(boardX, boardY) {
     onEdge = true;
   }
 
-  console.log(boardX, boardY, topEdge, leftEdge, rightEdge, bottomEdge);
-  console.log('On Edge: ' + onEdge);
   return onEdge;
 }
+
 function testBoard(state, hit, playerIndex, block) {
   var currentHit = hit;
   var miss = false;
@@ -309,7 +312,6 @@ function testBoard(state, hit, playerIndex, block) {
   var boardY;
   var positionX = 0;
   var positionY = 0;
-  console.log('Turn: ' + state.players[playerIndex].turnCount);
 
   for (boardY = block.y; boardY < state.board.length && boardY < block.y + block.height; boardY++) {
     positionX = 0;
@@ -323,24 +325,25 @@ function testBoard(state, hit, playerIndex, block) {
       var boardXY = state.board[boardY][boardX];
 
       if (shapeXY == 1) {
+        // console.log(boardY, boardX, boardXY);
         if (state.players[playerIndex].turnCount <= 0) {
           if (testEdges(boardX, boardY)) {
             miss = true;
-            break;
           }
         } else {
           if (boardXY > 0) {
             currentHit = true;
-            console.log(2);
-            break;
-          } else if (testCorners(state, playerIndex, boardX, boardY)) {
+            console.log(1);
+          }
+
+          if (testCorners(state, playerIndex, boardX, boardY)) {
             miss = true;
-            console.log(3);
-            break;
-          } else if (testSides(state, playerIndex, boardX, boardY)) {
+            console.log(2);
+          }
+
+          if (testSides(state, playerIndex, boardX, boardY)) {
             currentHit = true;
-            console.log(4);
-            break;
+            console.log(3);
           }
         }
       }
@@ -357,6 +360,7 @@ function testBoard(state, hit, playerIndex, block) {
 
   return currentHit;
 }
+
 function updateBoard(state, playerIndex, block) {
   var currentState = state;
   var team = playerIndex + 1;
@@ -384,6 +388,36 @@ function updateBoard(state, playerIndex, block) {
 
   return currentState;
 }
+
+function rotate90Clockwise(matrix) {
+  var result = [];
+
+  var _loop = function _loop(i) {
+    var row = matrix.map(function (e) {
+      return e[i];
+    }).reverse();
+    result.push(row);
+  };
+
+  for (var i = 0; i < matrix[0].length; i++) {
+    _loop(i);
+  }
+
+  return result;
+}
+
+function setRotatedBlock(currentBlock) {
+  var newBlock = currentBlock;
+
+  for (var i = 0; i < newBlock.angle; i++) {
+    newBlock.shape = rotate90Clockwise(newBlock.shape);
+  }
+
+  newBlock.width = newBlock.shape[0].length;
+  newBlock.height = newBlock.shape.length;
+  return newBlock;
+}
+
 function renderBoard(state) {
   var boardX;
   var boardY;
@@ -395,19 +429,108 @@ function renderBoard(state) {
     for (boardX = 0; boardX < state.board[boardY].length; boardX++) {
       row += "".concat(state.board[boardY][boardX], " ");
     }
-
-    console.log(row);
   }
-}
-function playTurn(state, playerIndex, blockIndex, gameObject) {
-  var currentState = state;
-  var hit = false;
-  var shape = _helpers_Data__WEBPACK_IMPORTED_MODULE_0__["DataBlocks"][blockIndex];
+
+  console.log(row);
+} // export function getOrigin(gameObject, index) {
+//     let blockIndex = index;
+//     let origin = {
+//         x: 0,
+//         y: 0
+//     };
+//     if (index == undefined) {
+//         if (gameObject.data.values.index != undefined) {
+//             blockIndex = gameObject.data.values.index;
+//         }
+//     }
+//     let shape = DataBlocks[blockIndex];
+//     let angle = gameObject.angle;
+//     if (angle < 0) {
+//         angle += 360;
+//     }
+//     let block = {
+//         shape: shape,
+//         angle: Math.round(angle / TURN_DEGREE),
+//         x: Math.round((gameObject.x - BOARD_LEFT) / GRID_SIZE),
+//         y: Math.round((gameObject.y - BOARD_TOP) / GRID_SIZE),
+//         width: shape[0].length,
+//         height: shape.length
+//     };
+//     block = setRotatedBlock(block);
+//     if (block.width % 2) {
+//         origin.x = (block.width / 2) * 32;
+//     } else {
+//         origin.x = (block.width / 2) * 32;
+//     }
+//     if (block.height % 2) {
+//         origin.y = (block.height / 2) * 32;
+//     } else {
+//         origin.y = (block.width / 2) * 32;
+//     }
+//     // if (block.angle == 0) {
+//     //     // origin.x = (block.width / block.angle) * 32;
+//     //     // origin.y = (block.height / block.angle) * 32;
+//     // } else if (block.angle == 1) {
+//     //     if (origin.x % 2) {
+//     //         origin.x = (block.width - 1) * 32;
+//     //         origin.y = (block.height - 1) * 32;
+//     //     }
+//     // } else if (block.angle == 2) {
+//     //     // origin.x = (block.width / block.angle) * 32;
+//     //     // origin.y = (block.height / block.angle) * 32;
+//     //     // origin.x = 64;
+//     //     // origin.y = 32;
+//     // } else if (block.angle == 3) {
+//     //     // origin.x = block.height * 32;
+//     //     // origin.y = block.width * 32;
+//     //     // origin.x = 64;
+//     //     // origin.y = 64;
+//     // }
+//     console.log(block);
+//     console.log(origin);
+//     return origin;
+// }
+
+function getNewShape(gameObject) {
+  var shape = null;
+
+  if (gameObject.data.values != undefined) {
+    shape = gameObject.data.values.shape;
+  }
+
+  var angle = gameObject.angle;
+
+  if (angle < 0) {
+    angle += 360;
+  }
+
+  console.log(gameObject.angle, angle);
   var block = {
     shape: shape,
+    angle: Math.round(angle / TURN_DEGREE),
     x: Math.round((gameObject.x - BOARD_LEFT) / GRID_SIZE),
     y: Math.round((gameObject.y - BOARD_TOP) / GRID_SIZE),
-    rotation: Math.round(gameObject.rotation),
+    width: shape[0].length,
+    height: shape.length
+  };
+  block = setRotatedBlock(block);
+  return block.shape;
+}
+function playTurn(state, playerIndex, gameObject) {
+  var currentState = state;
+  var hit = false;
+  var shape = null;
+
+  if (gameObject.data.values != undefined) {
+    shape = gameObject.data.values.shape;
+  }
+
+  console.log(Math.floor(gameObject.x - BOARD_LEFT));
+  console.log(Math.floor(gameObject.y - BOARD_TOP));
+  var block = {
+    shape: shape,
+    x: Math.floor((gameObject.x - BOARD_LEFT) / GRID_SIZE),
+    y: Math.floor((gameObject.y - BOARD_TOP) / GRID_SIZE),
     width: shape[0].length,
     height: shape.length,
     points: arraySum(shape)
@@ -415,21 +538,19 @@ function playTurn(state, playerIndex, blockIndex, gameObject) {
 
   if (block.x < 0 || block.y < 0) {
     hit = true;
-    console.log(1);
   } else if (block.x + block.width > currentState.board.length || block.y + block.height > currentState.board[0].length) {
     hit = true;
-    console.log(2);
   } else {
     hit = testBoard(currentState, hit, playerIndex, block);
-    console.log(3);
   }
+
+  renderBoard(currentState);
 
   if (!hit) {
     currentState.players[playerIndex].score += block.points;
     currentState.players[playerIndex].turnCount++;
     currentState.turnCount++;
     currentState = updateBoard(currentState, playerIndex, block);
-    renderBoard(currentState);
     return currentState;
   } else {
     throw 'Hit';
@@ -540,7 +661,7 @@ var Game = /*#__PURE__*/function (_Phaser$Scene) {
     value: function preload() {
       this.load.image('grid', 'assets/src/img/grid.png');
 
-      for (var i = 1; i <= _helpers_Data__WEBPACK_IMPORTED_MODULE_1__["DataBlocks"].length; i++) {
+      for (var i = 0; i < _helpers_Data__WEBPACK_IMPORTED_MODULE_1__["DataBlocks"].length; i++) {
         this.load.image("block-".concat(i), "assets/src/img/blocks/".concat(i, ".png"));
       }
     }
@@ -562,10 +683,10 @@ var Game = /*#__PURE__*/function (_Phaser$Scene) {
       });
       this.socket.on('connect', function () {
         console.log('Connected!');
-      }); // this.socket.on('join', function(payload) {
-      //     console.log('join');
-      // });
-
+      });
+      this.socket.on('join', function (payload) {
+        console.log('Joined!');
+      });
       this.socket.on('startGame', function (payload) {
         var id = payload.players.findIndex(function (x) {
           return x.id === self.socket.id;
@@ -587,11 +708,13 @@ var Game = /*#__PURE__*/function (_Phaser$Scene) {
           scoreString = scoreString + "".concat(i, ": ").concat(payload.state.players[i].score, ", ");
         }
 
-        self.scoreText.setText(scoreString); // if (playerIndex !== self.playerIndex) {
+        self.scoreText.setText(scoreString);
 
-        var sprite = payload.gameObject.textureKey;
-        var block = new _components_Block__WEBPACK_IMPORTED_MODULE_3__["default"](self);
-        block.renderOpponent(payload.gameObject.x, payload.gameObject.y, payload.gameObject.rotation, payload.values.index, self.playerIndex, sprite).disableInteractive(); // }
+        if (payload.playerIndex !== self.playerIndex) {
+          var sprite = payload.gameObject.textureKey;
+          var block = new _components_Block__WEBPACK_IMPORTED_MODULE_3__["default"](self);
+          block.renderOpponent(payload.gameObject.x, payload.gameObject.y, payload.gameObject.rotation, payload.values.index, self.playerIndex, sprite).disableInteractive();
+        }
       });
       this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
         gameObject.x = Phaser.Math.Snap.To(dragX, 32);
@@ -599,10 +722,10 @@ var Game = /*#__PURE__*/function (_Phaser$Scene) {
       });
       this.input.on('dragstart', function (pointer, gameObject) {
         self.children.bringToTop(gameObject);
-        this.currentBlock = gameObject;
+        self.currentBlock = gameObject;
       });
       this.input.on('dragend', function (pointer, gameObject, dropped) {
-        this.currentBlock = null;
+        self.currentBlock = null;
         var values = null;
 
         if (gameObject.data.values != undefined) {
@@ -610,9 +733,10 @@ var Game = /*#__PURE__*/function (_Phaser$Scene) {
         }
 
         try {
-          self.state = Object(_helpers_Logic__WEBPACK_IMPORTED_MODULE_2__["playTurn"])(self.state, self.playerIndex, values.index, gameObject);
+          self.state = Object(_helpers_Logic__WEBPACK_IMPORTED_MODULE_2__["playTurn"])(self.state, self.playerIndex, gameObject);
           var payload = {
             roomIndex: 0,
+            playerIndex: self.playerIndex,
             state: self.state,
             gameObject: gameObject,
             values: values
@@ -633,16 +757,58 @@ var Game = /*#__PURE__*/function (_Phaser$Scene) {
       var right = this.cursors.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
 
       if (this.currentBlock) {
-        console.log(this.currentBlock);
-
         if (Phaser.Input.Keyboard.JustDown(a) || Phaser.Input.Keyboard.JustDown(left)) {
           console.log('Left');
           this.currentBlock.angle -= 90;
+          var newShape = Object(_helpers_Logic__WEBPACK_IMPORTED_MODULE_2__["getNewShape"])(this.currentBlock);
+          this.currentBlock.setData({
+            shape: newShape
+          });
+          console.log(newShape);
+          var width = newShape[0].length;
+          var height = newShape.length;
+
+          if (width % 2 == 0 && height % 2 == 0) {
+            console.log('width even and height even');
+          } else if (width % 2 > 0 && height % 2 == 0) {
+            this.currentBlock.x -= 16;
+            console.log('width odd and height even');
+          } else if (width % 2 == 0 && height % 2 > 0) {
+            this.currentBlock.y -= 16;
+            console.log('width even and height odd');
+          } else {
+            this.currentBlock.x -= 16;
+            this.currentBlock.y -= 16;
+            console.log('width odd and height odd');
+          }
         }
 
         if (Phaser.Input.Keyboard.JustDown(d) || Phaser.Input.Keyboard.JustDown(right)) {
           console.log('Right');
           this.currentBlock.angle += 90;
+
+          var _newShape = Object(_helpers_Logic__WEBPACK_IMPORTED_MODULE_2__["getNewShape"])(this.currentBlock);
+
+          this.currentBlock.setData({
+            shape: _newShape
+          });
+          var _width = _newShape[0].length;
+          var _height = _newShape.length;
+          console.log(_newShape);
+
+          if (_width % 2 == 0 && _height % 2 == 0) {
+            console.log('width even and height even');
+          } else if (_width % 2 > 0 && _height % 2 == 0) {
+            this.currentBlock.x -= 16;
+            console.log('width odd and height even');
+          } else if (_width % 2 == 0 && _height % 2 > 0) {
+            this.currentBlock.y -= 16;
+            console.log('width even and height odd');
+          } else {
+            this.currentBlock.x -= 16;
+            this.currentBlock.y -= 16;
+            console.log('width odd and height odd');
+          }
         }
       }
     }

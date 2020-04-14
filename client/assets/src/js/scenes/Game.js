@@ -85,8 +85,21 @@ export default class Game extends Phaser.Scene {
         });
 
         this.input.on('drag', function(pointer, gameObject, dragX, dragY) {
-            gameObject.x = Phaser.Math.Snap.To(dragX, 32);
-            gameObject.y = Phaser.Math.Snap.To(dragY, 32);
+            let shape = gameObject.data.values.shape;
+            let width = shape[0].length;
+            let height = shape.length;
+
+            if (width % 2 == 0) {
+                gameObject.x = Phaser.Math.Snap.To(dragX, 32);
+            } else {
+                gameObject.x = Phaser.Math.Snap.To(dragX, 32, 16);
+            }
+
+            if (height % 2 == 0) {
+                gameObject.y = Phaser.Math.Snap.To(dragY, 32);
+            } else {
+                gameObject.y = Phaser.Math.Snap.To(dragY, 32, 16);
+            }
         });
 
         this.input.on('dragstart', function(pointer, gameObject) {
@@ -129,57 +142,19 @@ export default class Game extends Phaser.Scene {
 
         if (this.currentBlock) {
             if (Phaser.Input.Keyboard.JustDown(a) || Phaser.Input.Keyboard.JustDown(left)) {
-                console.log('Left');
-                this.currentBlock.angle -= 90;
+                let angle = -90;
+                this.currentBlock.angle += angle;
 
-                let newShape = getNewShape(this.currentBlock);
+                let newShape = getNewShape(this.currentBlock, angle);
                 this.currentBlock.setData({ shape: newShape });
-
-                console.log(newShape);
-
-                let width = newShape[0].length;
-                let height = newShape.length;
-
-                if (width % 2 == 0 && height % 2 == 0) {
-                    console.log('width even and height even');
-                } else if (width % 2 > 0 && height % 2 == 0) {
-                    this.currentBlock.x -= 16;
-                    console.log('width odd and height even');
-                } else if (width % 2 == 0 && height % 2 > 0) {
-                    this.currentBlock.y -= 16;
-                    console.log('width even and height odd');
-                } else {
-                    this.currentBlock.x -= 16;
-                    this.currentBlock.y -= 16;
-                    console.log('width odd and height odd');
-                }
             }
 
             if (Phaser.Input.Keyboard.JustDown(d) || Phaser.Input.Keyboard.JustDown(right)) {
-                console.log('Right');
-                this.currentBlock.angle += 90;
+                let angle = -90;
+                this.currentBlock.angle += angle;
 
-                let newShape = getNewShape(this.currentBlock);
+                let newShape = getNewShape(this.currentBlock, angle);
                 this.currentBlock.setData({ shape: newShape });
-
-                let width = newShape[0].length;
-                let height = newShape.length;
-
-                console.log(newShape);
-
-                if (width % 2 == 0 && height % 2 == 0) {
-                    console.log('width even and height even');
-                } else if (width % 2 > 0 && height % 2 == 0) {
-                    this.currentBlock.x -= 16;
-                    console.log('width odd and height even');
-                } else if (width % 2 == 0 && height % 2 > 0) {
-                    this.currentBlock.y -= 16;
-                    console.log('width even and height odd');
-                } else {
-                    this.currentBlock.x -= 16;
-                    this.currentBlock.y -= 16;
-                    console.log('width odd and height odd');
-                }
             }
         }
     }

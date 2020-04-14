@@ -216,26 +216,30 @@ function arraySum(i) {
 function testSides(state, playerIndex, boardX, boardY) {
   var hit = false;
   var team = playerIndex + 1;
+  var topEdge = 0;
+  var leftEdge = 0;
+  var rightEdge = BOARD_WIDTH / GRID_SIZE;
+  var bottomEdge = BOARD_HEIGHT / GRID_SIZE;
 
-  if (boardY + 1 < (BOARD_HEIGHT + BOARD_TOP) / GRID_SIZE) {
+  if (boardY + 1 < bottomEdge) {
     if (state.board[boardY + 1][boardX] == team) {
       hit = true;
     }
   }
 
-  if (boardY - 1 > 0) {
+  if (boardY - 1 > topEdge) {
     if (state.board[boardY - 1][boardX] == team) {
       hit = true;
     }
   }
 
-  if (boardX + 1 < (BOARD_WIDTH + BOARD_LEFT) / GRID_SIZE) {
+  if (boardX + 1 < rightEdge) {
     if (state.board[boardY][boardX + 1] == team) {
       hit = true;
     }
   }
 
-  if (boardX - 1 > 0) {
+  if (boardX - 1 > leftEdge) {
     if (state.board[boardY][boardX - 1] == team) {
       hit = true;
     }
@@ -249,8 +253,8 @@ function testCorners(state, playerIndex, boardX, boardY) {
   var team = playerIndex + 1;
   var topEdge = 0;
   var leftEdge = 0;
-  var rightEdge = BOARD_WIDTH / GRID_SIZE - 1;
-  var bottomEdge = BOARD_HEIGHT / GRID_SIZE - 1;
+  var rightEdge = BOARD_WIDTH / GRID_SIZE;
+  var bottomEdge = BOARD_HEIGHT / GRID_SIZE;
 
   if (boardY + 1 < bottomEdge && boardX + 1 < rightEdge) {
     if (state.board[boardY + 1][boardX + 1] == team) {
@@ -258,19 +262,19 @@ function testCorners(state, playerIndex, boardX, boardY) {
     }
   }
 
-  if (boardY + 1 < bottomEdge && boardX - 1 > leftEdge) {
+  if (boardY + 1 < bottomEdge && boardX - 1 >= leftEdge) {
     if (state.board[boardY + 1][boardX - 1] == team) {
       miss = true;
     }
   }
 
-  if (boardY - 1 > topEdge && boardX - 1 > leftEdge) {
+  if (boardY - 1 >= topEdge && boardX - 1 >= leftEdge) {
     if (state.board[boardY - 1][boardX - 1] == team) {
       miss = true;
     }
   }
 
-  if (boardY - 1 > topEdge && boardX + 1 < rightEdge) {
+  if (boardY - 1 >= topEdge && boardX + 1 < rightEdge) {
     if (state.board[boardY - 1][boardX + 1] == team) {
       miss = true;
     }
@@ -325,7 +329,6 @@ function testBoard(state, hit, playerIndex, block) {
       var boardXY = state.board[boardY][boardX];
 
       if (shapeXY == 1) {
-        // console.log(boardY, boardX, boardXY);
         if (state.players[playerIndex].turnCount <= 0) {
           if (testEdges(boardX, boardY)) {
             miss = true;
@@ -429,82 +432,21 @@ function renderBoard(state) {
     for (boardX = 0; boardX < state.board[boardY].length; boardX++) {
       row += "".concat(state.board[boardY][boardX], " ");
     }
+
+    console.log(row);
   }
-
-  console.log(row);
-} // export function getOrigin(gameObject, index) {
-//     let blockIndex = index;
-//     let origin = {
-//         x: 0,
-//         y: 0
-//     };
-//     if (index == undefined) {
-//         if (gameObject.data.values.index != undefined) {
-//             blockIndex = gameObject.data.values.index;
-//         }
-//     }
-//     let shape = DataBlocks[blockIndex];
-//     let angle = gameObject.angle;
-//     if (angle < 0) {
-//         angle += 360;
-//     }
-//     let block = {
-//         shape: shape,
-//         angle: Math.round(angle / TURN_DEGREE),
-//         x: Math.round((gameObject.x - BOARD_LEFT) / GRID_SIZE),
-//         y: Math.round((gameObject.y - BOARD_TOP) / GRID_SIZE),
-//         width: shape[0].length,
-//         height: shape.length
-//     };
-//     block = setRotatedBlock(block);
-//     if (block.width % 2) {
-//         origin.x = (block.width / 2) * 32;
-//     } else {
-//         origin.x = (block.width / 2) * 32;
-//     }
-//     if (block.height % 2) {
-//         origin.y = (block.height / 2) * 32;
-//     } else {
-//         origin.y = (block.width / 2) * 32;
-//     }
-//     // if (block.angle == 0) {
-//     //     // origin.x = (block.width / block.angle) * 32;
-//     //     // origin.y = (block.height / block.angle) * 32;
-//     // } else if (block.angle == 1) {
-//     //     if (origin.x % 2) {
-//     //         origin.x = (block.width - 1) * 32;
-//     //         origin.y = (block.height - 1) * 32;
-//     //     }
-//     // } else if (block.angle == 2) {
-//     //     // origin.x = (block.width / block.angle) * 32;
-//     //     // origin.y = (block.height / block.angle) * 32;
-//     //     // origin.x = 64;
-//     //     // origin.y = 32;
-//     // } else if (block.angle == 3) {
-//     //     // origin.x = block.height * 32;
-//     //     // origin.y = block.width * 32;
-//     //     // origin.x = 64;
-//     //     // origin.y = 64;
-//     // }
-//     console.log(block);
-//     console.log(origin);
-//     return origin;
-// }
-
-function getNewShape(gameObject) {
+}
+function getNewShape(gameObject, angle) {
   var shape = null;
 
   if (gameObject.data.values != undefined) {
     shape = gameObject.data.values.shape;
   }
 
-  var angle = gameObject.angle;
-
   if (angle < 0) {
     angle += 360;
   }
 
-  console.log(gameObject.angle, angle);
   var block = {
     shape: shape,
     angle: Math.round(angle / TURN_DEGREE),
@@ -525,14 +467,14 @@ function playTurn(state, playerIndex, gameObject) {
     shape = gameObject.data.values.shape;
   }
 
-  console.log(Math.floor(gameObject.x - BOARD_LEFT));
-  console.log(Math.floor(gameObject.y - BOARD_TOP));
+  var width = shape[0].length;
+  var height = shape.length;
   var block = {
     shape: shape,
-    x: Math.floor((gameObject.x - BOARD_LEFT) / GRID_SIZE),
-    y: Math.floor((gameObject.y - BOARD_TOP) / GRID_SIZE),
-    width: shape[0].length,
-    height: shape.length,
+    x: Math.floor((gameObject.x - BOARD_LEFT) / GRID_SIZE - width / 2),
+    y: Math.floor((gameObject.y - BOARD_TOP) / GRID_SIZE - height / 2),
+    width: width,
+    height: height,
     points: arraySum(shape)
   };
 
@@ -544,16 +486,16 @@ function playTurn(state, playerIndex, gameObject) {
     hit = testBoard(currentState, hit, playerIndex, block);
   }
 
-  renderBoard(currentState);
-
   if (!hit) {
     currentState.players[playerIndex].score += block.points;
     currentState.players[playerIndex].turnCount++;
     currentState.turnCount++;
     currentState = updateBoard(currentState, playerIndex, block);
+    console.log('Success'); // renderBoard(currentState);
+
     return currentState;
   } else {
-    throw 'Hit';
+    throw 'Failure';
   }
 }
 
@@ -717,8 +659,21 @@ var Game = /*#__PURE__*/function (_Phaser$Scene) {
         }
       });
       this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
-        gameObject.x = Phaser.Math.Snap.To(dragX, 32);
-        gameObject.y = Phaser.Math.Snap.To(dragY, 32);
+        var shape = gameObject.data.values.shape;
+        var width = shape[0].length;
+        var height = shape.length;
+
+        if (width % 2 == 0) {
+          gameObject.x = Phaser.Math.Snap.To(dragX, 32);
+        } else {
+          gameObject.x = Phaser.Math.Snap.To(dragX, 32, 16);
+        }
+
+        if (height % 2 == 0) {
+          gameObject.y = Phaser.Math.Snap.To(dragY, 32);
+        } else {
+          gameObject.y = Phaser.Math.Snap.To(dragY, 32, 16);
+        }
       });
       this.input.on('dragstart', function (pointer, gameObject) {
         self.children.bringToTop(gameObject);
@@ -758,57 +713,24 @@ var Game = /*#__PURE__*/function (_Phaser$Scene) {
 
       if (this.currentBlock) {
         if (Phaser.Input.Keyboard.JustDown(a) || Phaser.Input.Keyboard.JustDown(left)) {
-          console.log('Left');
-          this.currentBlock.angle -= 90;
-          var newShape = Object(_helpers_Logic__WEBPACK_IMPORTED_MODULE_2__["getNewShape"])(this.currentBlock);
+          var angle = -90;
+          this.currentBlock.angle += angle;
+          var newShape = Object(_helpers_Logic__WEBPACK_IMPORTED_MODULE_2__["getNewShape"])(this.currentBlock, angle);
           this.currentBlock.setData({
             shape: newShape
           });
-          console.log(newShape);
-          var width = newShape[0].length;
-          var height = newShape.length;
-
-          if (width % 2 == 0 && height % 2 == 0) {
-            console.log('width even and height even');
-          } else if (width % 2 > 0 && height % 2 == 0) {
-            this.currentBlock.x -= 16;
-            console.log('width odd and height even');
-          } else if (width % 2 == 0 && height % 2 > 0) {
-            this.currentBlock.y -= 16;
-            console.log('width even and height odd');
-          } else {
-            this.currentBlock.x -= 16;
-            this.currentBlock.y -= 16;
-            console.log('width odd and height odd');
-          }
         }
 
         if (Phaser.Input.Keyboard.JustDown(d) || Phaser.Input.Keyboard.JustDown(right)) {
-          console.log('Right');
-          this.currentBlock.angle += 90;
+          var _angle = -90;
 
-          var _newShape = Object(_helpers_Logic__WEBPACK_IMPORTED_MODULE_2__["getNewShape"])(this.currentBlock);
+          this.currentBlock.angle += _angle;
+
+          var _newShape = Object(_helpers_Logic__WEBPACK_IMPORTED_MODULE_2__["getNewShape"])(this.currentBlock, _angle);
 
           this.currentBlock.setData({
             shape: _newShape
           });
-          var _width = _newShape[0].length;
-          var _height = _newShape.length;
-          console.log(_newShape);
-
-          if (_width % 2 == 0 && _height % 2 == 0) {
-            console.log('width even and height even');
-          } else if (_width % 2 > 0 && _height % 2 == 0) {
-            this.currentBlock.x -= 16;
-            console.log('width odd and height even');
-          } else if (_width % 2 == 0 && _height % 2 > 0) {
-            this.currentBlock.y -= 16;
-            console.log('width even and height odd');
-          } else {
-            this.currentBlock.x -= 16;
-            this.currentBlock.y -= 16;
-            console.log('width odd and height odd');
-          }
         }
       }
     }

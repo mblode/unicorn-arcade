@@ -89,26 +89,26 @@ function testCorners(state, playerIndex, boardX, boardY) {
     return miss;
 }
 
-function testEdges(boardX, boardY) {
+function testEdges(playerIndex, boardX, boardY) {
     let onEdge = false;
     const topEdge = 0;
     const leftEdge = 0;
     const rightEdge = BOARD_WIDTH / GRID_SIZE - 1;
     const bottomEdge = BOARD_HEIGHT / GRID_SIZE - 1;
 
-    if (boardY == bottomEdge && boardX == rightEdge) {
+    if (boardY == topEdge && boardX == leftEdge && playerIndex == 0) {
         onEdge = true;
     }
 
-    if (boardY == bottomEdge && boardX == leftEdge) {
+    if (boardY == topEdge && boardX == rightEdge && playerIndex == 1) {
         onEdge = true;
     }
 
-    if (boardY == topEdge && boardX == leftEdge) {
+    if (boardY == bottomEdge && boardX == leftEdge && playerIndex == 2) {
         onEdge = true;
     }
 
-    if (boardY == topEdge && boardX == rightEdge) {
+    if (boardY == bottomEdge && boardX == rightEdge && playerIndex == 3) {
         onEdge = true;
     }
 
@@ -136,7 +136,7 @@ function testBoard(state, hit, playerIndex, block) {
 
             if (shapeXY == 1) {
                 if (state.players[playerIndex].turnCount <= 0) {
-                    if (testEdges(boardX, boardY)) {
+                    if (testEdges(playerIndex, boardX, boardY)) {
                         miss = true;
                     }
                 } else {
@@ -201,23 +201,54 @@ function updateBoard(state, playerIndex, block) {
 function rotate90Clockwise(matrix) {
     let result = [];
     for (let i = 0; i < matrix[0].length; i++) {
-        let row = matrix.map(e => e[i]).reverse();
+        let row = matrix.map((e) => e[i]).reverse();
         result.push(row);
     }
     return result;
 }
 
-function setRotatedBlock(currentBlock) {
-    let newBlock = currentBlock;
+function setRotatedBlock(shape, angle) {
+    let newShape = shape;
 
-    for (let i = 0; i < newBlock.angle; i++) {
-        newBlock.shape = rotate90Clockwise(newBlock.shape);
+    for (let i = 0; i < angle; i++) {
+        newShape = rotate90Clockwise(newShape);
     }
 
-    newBlock.width = newBlock.shape[0].length;
-    newBlock.height = newBlock.shape.length;
+    return newShape;
+}
 
-    return newBlock;
+function flipH(a) {
+    const h = a.length;
+    let b = new Array(h);
+
+    for (let y = 0; y < h; y++) {
+        let w = a[y].length;
+        b[y] = new Array(w);
+
+        for (let x = 0; x < w; x++) {
+            let n = w - 1 - x;
+            b[y][n] = a[y][x];
+        }
+    }
+
+    return b;
+}
+
+function flipV(a) {
+    const h = a.length;
+    let b = new Array(h);
+
+    for (let y = 0; y < h; y++) {
+        let w = a[y].length;
+        let n = h - 1 - y;
+        b[n] = new Array(w);
+
+        for (let x = 0; x < w; x++) {
+            b[n][x] = a[y][x];
+        }
+    }
+
+    return b;
 }
 
 export function renderBoard(state) {
@@ -235,7 +266,7 @@ export function renderBoard(state) {
     }
 }
 
-export function getNewShape(gameObject, angle) {
+export function rotateShape(gameObject, angle) {
     let shape = null;
 
     if (gameObject.data.values != undefined) {
@@ -246,18 +277,22 @@ export function getNewShape(gameObject, angle) {
         angle += 360;
     }
 
-    let block = {
-        shape: shape,
-        angle: Math.round(angle / TURN_DEGREE),
-        x: Math.round((gameObject.x - BOARD_LEFT) / GRID_SIZE),
-        y: Math.round((gameObject.y - BOARD_TOP) / GRID_SIZE),
-        width: shape[0].length,
-        height: shape.length
-    };
+    angle = Math.round(angle / TURN_DEGREE);
 
-    block = setRotatedBlock(block);
+    return setRotatedBlock(shape, angle);
+}
 
-    return block.shape;
+export function flipShape(gameObject, angle) {
+    let shape = null;
+
+    if (gameObject.data.values != undefined) {
+        shape = gameObject.data.values.shape;
+    }
+
+    shape = flipH(shape);
+    shape = flipV(shape);
+
+    return shape;
 }
 
 export function playTurn(state, playerIndex, gameObject) {
@@ -278,7 +313,7 @@ export function playTurn(state, playerIndex, gameObject) {
         y: Math.floor((gameObject.y - BOARD_TOP) / GRID_SIZE - height / 2),
         width: width,
         height: height,
-        points: arraySum(shape)
+        points: arraySum(shape),
     };
 
     if (block.x < 0 || block.y < 0) {
@@ -299,7 +334,7 @@ export function playTurn(state, playerIndex, gameObject) {
         currentState = updateBoard(currentState, playerIndex, block);
         console.log('Success');
 
-        // renderBoard(currentState);
+        renderBoard(currentState);
 
         return currentState;
     } else {

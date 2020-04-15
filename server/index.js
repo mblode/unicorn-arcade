@@ -16,7 +16,7 @@ app.get('/', (req, res) => {
 io.on('connection', function (socket) {
     console.log('A user connected: ' + socket.id);
 
-    socket.on('join', function (data) {
+    socket.on('joinGame', function (data) {
         var game;
 
         if (rooms.length === 0 || !rooms[rooms.length - 1].isWaiting()) {
@@ -30,9 +30,9 @@ io.on('connection', function (socket) {
 
         console.log(game.getNumPlayers());
 
-        if (game.getNumPlayers() >= 2) {
-            io.emit('startGame', game.state);
-        }
+        // if (game.getNumPlayers() >= 2) {
+        io.emit('startGame', game.state);
+        // }
     });
 
     socket.on('updateGameState', function (payload) {

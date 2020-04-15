@@ -19,13 +19,13 @@ export default class Block {
             block.setData({ shape: DataBlocks[blockIndex], played: false, index: blockIndex });
 
             if (playerIndex == 0) {
-                block.setTint(0x0000ff);
+                block.setTint(0xf6d240);
             } else if (playerIndex == 1) {
-                block.setTint(0xff0000);
+                block.setTint(0xafd55b);
             } else if (playerIndex == 2) {
-                block.setTint(0x00ff00);
+                block.setTint(0xd82c0a);
             } else {
-                block.setTint(0xf00f0);
+                block.setTint(0x2465c8);
             }
 
             return block;
@@ -39,13 +39,13 @@ export default class Block {
             block.setData({ shape: shape, played: false, index: blockIndex });
 
             if (playerIndex == 0) {
-                block.setTint(0x0000ff);
+                block.setTint(0xf6d240);
             } else if (playerIndex == 1) {
-                block.setTint(0xff0000);
+                block.setTint(0xafd55b);
             } else if (playerIndex == 2) {
-                block.setTint(0x00ff00);
+                block.setTint(0xd82c0a);
             } else {
-                block.setTint(0xf00f0);
+                block.setTint(0x2465c8);
             }
 
             return block;

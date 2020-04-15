@@ -36,13 +36,13 @@ var Block = function Block(scene) {
     });
 
     if (playerIndex == 0) {
-      block.setTint(0x0000ff);
+      block.setTint(0xf6d240);
     } else if (playerIndex == 1) {
-      block.setTint(0xff0000);
+      block.setTint(0xafd55b);
     } else if (playerIndex == 2) {
-      block.setTint(0x00ff00);
+      block.setTint(0xd82c0a);
     } else {
-      block.setTint(0xf00f0);
+      block.setTint(0x2465c8);
     }
 
     return block;
@@ -59,13 +59,13 @@ var Block = function Block(scene) {
     });
 
     if (playerIndex == 0) {
-      block.setTint(0x0000ff);
+      block.setTint(0xf6d240);
     } else if (playerIndex == 1) {
-      block.setTint(0xff0000);
+      block.setTint(0xafd55b);
     } else if (playerIndex == 2) {
-      block.setTint(0x00ff00);
+      block.setTint(0xd82c0a);
     } else {
-      block.setTint(0xf00f0);
+      block.setTint(0x2465c8);
     }
 
     return block;
@@ -105,60 +105,14 @@ var Board = function Board(scene) {
 
 /***/ }),
 
-/***/ "./assets/src/js/components/Start.js":
-/*!*******************************************!*\
-  !*** ./assets/src/js/components/Start.js ***!
-  \*******************************************/
+/***/ "./assets/src/js/components/Buttons.js":
+/*!*********************************************!*\
+  !*** ./assets/src/js/components/Buttons.js ***!
+  \*********************************************/
 /*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports) {
 
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Start; });
-/* harmony import */ var _Block__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Block */ "./assets/src/js/components/Block.js");
-/* harmony import */ var _helpers_Data__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../helpers/Data */ "./assets/src/js/helpers/Data.js");
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-
-
-
-var Start = function Start(scene) {
-  _classCallCheck(this, Start);
-
-  this.renderStart = function () {
-    var start = scene.add.text(400, 30, ['Start Game']).setFontSize(18).setColor('#333333').setInteractive();
-    start.on('pointerdown', function () {
-      scene.socket.emit('join');
-    });
-    start.on('pointerover', function () {
-      start.setColor('#111111');
-    });
-    start.on('pointerout', function () {
-      start.setColor('#222222');
-    });
-    return start;
-  };
-
-  this.startGame = function (state) {
-    var scoreString = '';
-
-    for (var i = 0; i < state.players.length; i++) {
-      scoreString = scoreString += "".concat(i, ": ").concat(state.players[i].score, " ");
-    }
-
-    scene.scoreText.setText(scoreString);
-
-    for (var _i = 0; _i < _helpers_Data__WEBPACK_IMPORTED_MODULE_1__["DataBlocks"].length; _i++) {
-      var playerBlock = new _Block__WEBPACK_IMPORTED_MODULE_0__["default"](scene);
-      playerBlock.renderPlayer(_i, scene.playerIndex);
-    }
-
-    scene.startButton.disableInteractive();
-    scene.startButton.visible = 0;
-  };
-};
-
-
+throw new Error("Module build failed (from ./node_modules/babel-loader/lib/index.js):\nSyntaxError: /Users/mblode/Sites/unicorn/client/assets/src/js/components/Buttons.js: Unexpected token, expected \",\" (33:16)\n\n\u001b[0m \u001b[90m 31 | \u001b[39m                }\u001b[0m\n\u001b[0m \u001b[90m 32 | \u001b[39m\u001b[0m\n\u001b[0m\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 33 | \u001b[39m                space\u001b[33m:\u001b[39m \u001b[35m0\u001b[39m\u001b[33m,\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m    | \u001b[39m                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 34 | \u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 35 | \u001b[39m                \u001b[90m// name: '',\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 36 | \u001b[39m                \u001b[90m// draggable: false,\u001b[39m\u001b[0m\n    at Parser._raise (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:742:17)\n    at Parser.raiseWithData (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:735:17)\n    at Parser.raise (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:729:17)\n    at Parser.unexpected (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:8757:16)\n    at Parser.expect (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:8743:28)\n    at Parser.parseObj (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:10365:14)\n    at Parser.parseExprAtom (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:9995:28)\n    at Parser.parseExprSubscripts (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:9602:23)\n    at Parser.parseMaybeUnary (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:9582:21)\n    at Parser.parseExprOps (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:9452:23)\n    at Parser.parseMaybeConditional (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:9425:23)\n    at Parser.parseMaybeAssign (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:9380:21)\n    at Parser.parseExprListItem (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:10718:18)\n    at Parser.parseCallExpressionArguments (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:9790:22)\n    at Parser.parseSubscript (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:9696:31)\n    at Parser.parseSubscripts (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:9625:19)\n    at Parser.parseExprSubscripts (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:9608:17)\n    at Parser.parseMaybeUnary (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:9582:21)\n    at Parser.parseExprOps (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:9452:23)\n    at Parser.parseMaybeConditional (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:9425:23)\n    at Parser.parseMaybeAssign (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:9380:21)\n    at Parser.parseVar (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11740:26)\n    at Parser.parseVarStatement (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11549:10)\n    at Parser.parseStatementContent (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11148:21)\n    at Parser.parseStatement (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11081:17)\n    at Parser.parseBlockOrModuleBlockBody (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11656:25)\n    at Parser.parseBlockBody (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11642:10)\n    at Parser.parseBlock (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:11626:10)\n    at Parser.parseFunctionBody (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:10634:24)\n    at Parser.parseArrowExpression (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:10603:10)\n    at Parser.parseParenAndDistinguishExpression (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:10221:12)\n    at Parser.parseExprAtom (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:9947:21)\n    at Parser.parseExprSubscripts (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:9602:23)\n    at Parser.parseMaybeUnary (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:9582:21)\n    at Parser.parseExprOps (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:9452:23)\n    at Parser.parseMaybeConditional (/Users/mblode/Sites/unicorn/client/node_modules/@babel/parser/lib/index.js:9425:23)");
 
 /***/ }),
 
@@ -184,13 +138,14 @@ var DataBlocks = [[[1]], [[1, 1]], [[1, 1], [0, 1]], [[1, 1, 1]], [[1, 1], [1, 1
 /*!****************************************!*\
   !*** ./assets/src/js/helpers/Logic.js ***!
   \****************************************/
-/*! exports provided: renderBoard, getNewShape, playTurn */
+/*! exports provided: renderBoard, rotateShape, flipShape, playTurn */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "renderBoard", function() { return renderBoard; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getNewShape", function() { return getNewShape; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "rotateShape", function() { return rotateShape; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "flipShape", function() { return flipShape; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "playTurn", function() { return playTurn; });
 /* harmony import */ var _helpers_Data__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../helpers/Data */ "./assets/src/js/helpers/Data.js");
 
@@ -285,26 +240,26 @@ function testCorners(state, playerIndex, boardX, boardY) {
   return miss;
 }
 
-function testEdges(boardX, boardY) {
+function testEdges(playerIndex, boardX, boardY) {
   var onEdge = false;
   var topEdge = 0;
   var leftEdge = 0;
   var rightEdge = BOARD_WIDTH / GRID_SIZE - 1;
   var bottomEdge = BOARD_HEIGHT / GRID_SIZE - 1;
 
-  if (boardY == bottomEdge && boardX == rightEdge) {
+  if (boardY == topEdge && boardX == leftEdge && playerIndex == 0) {
     onEdge = true;
   }
 
-  if (boardY == bottomEdge && boardX == leftEdge) {
+  if (boardY == topEdge && boardX == rightEdge && playerIndex == 1) {
     onEdge = true;
   }
 
-  if (boardY == topEdge && boardX == leftEdge) {
+  if (boardY == bottomEdge && boardX == leftEdge && playerIndex == 2) {
     onEdge = true;
   }
 
-  if (boardY == topEdge && boardX == rightEdge) {
+  if (boardY == bottomEdge && boardX == rightEdge && playerIndex == 3) {
     onEdge = true;
   }
 
@@ -332,7 +287,7 @@ function testBoard(state, hit, playerIndex, block) {
 
       if (shapeXY == 1) {
         if (state.players[playerIndex].turnCount <= 0) {
-          if (testEdges(boardX, boardY)) {
+          if (testEdges(playerIndex, boardX, boardY)) {
             miss = true;
           }
         } else {
@@ -411,16 +366,48 @@ function rotate90Clockwise(matrix) {
   return result;
 }
 
-function setRotatedBlock(currentBlock) {
-  var newBlock = currentBlock;
+function setRotatedBlock(shape, angle) {
+  var newShape = shape;
 
-  for (var i = 0; i < newBlock.angle; i++) {
-    newBlock.shape = rotate90Clockwise(newBlock.shape);
+  for (var i = 0; i < angle; i++) {
+    newShape = rotate90Clockwise(newShape);
   }
 
-  newBlock.width = newBlock.shape[0].length;
-  newBlock.height = newBlock.shape.length;
-  return newBlock;
+  return newShape;
+}
+
+function flipH(a) {
+  var h = a.length;
+  var b = new Array(h);
+
+  for (var y = 0; y < h; y++) {
+    var w = a[y].length;
+    b[y] = new Array(w);
+
+    for (var x = 0; x < w; x++) {
+      var n = w - 1 - x;
+      b[y][n] = a[y][x];
+    }
+  }
+
+  return b;
+}
+
+function flipV(a) {
+  var h = a.length;
+  var b = new Array(h);
+
+  for (var y = 0; y < h; y++) {
+    var w = a[y].length;
+    var n = h - 1 - y;
+    b[n] = new Array(w);
+
+    for (var x = 0; x < w; x++) {
+      b[n][x] = a[y][x];
+    }
+  }
+
+  return b;
 }
 
 function renderBoard(state) {
@@ -438,7 +425,7 @@ function renderBoard(state) {
     console.log(row);
   }
 }
-function getNewShape(gameObject, angle) {
+function rotateShape(gameObject, angle) {
   var shape = null;
 
   if (gameObject.data.values != undefined) {
@@ -449,16 +436,19 @@ function getNewShape(gameObject, angle) {
     angle += 360;
   }
 
-  var block = {
-    shape: shape,
-    angle: Math.round(angle / TURN_DEGREE),
-    x: Math.round((gameObject.x - BOARD_LEFT) / GRID_SIZE),
-    y: Math.round((gameObject.y - BOARD_TOP) / GRID_SIZE),
-    width: shape[0].length,
-    height: shape.length
-  };
-  block = setRotatedBlock(block);
-  return block.shape;
+  angle = Math.round(angle / TURN_DEGREE);
+  return setRotatedBlock(shape, angle);
+}
+function flipShape(gameObject, angle) {
+  var shape = null;
+
+  if (gameObject.data.values != undefined) {
+    shape = gameObject.data.values.shape;
+  }
+
+  shape = flipH(shape);
+  shape = flipV(shape);
+  return shape;
 }
 function playTurn(state, playerIndex, gameObject) {
   var currentState = state;
@@ -493,8 +483,8 @@ function playTurn(state, playerIndex, gameObject) {
     currentState.players[playerIndex].turnCount++;
     currentState.turnCount++;
     currentState = updateBoard(currentState, playerIndex, block);
-    console.log('Success'); // renderBoard(currentState);
-
+    console.log('Success');
+    renderBoard(currentState);
     return currentState;
   } else {
     throw 'Failure';
@@ -514,7 +504,9 @@ function playTurn(state, playerIndex, gameObject) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var phaser__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! phaser */ "./node_modules/phaser/src/phaser.js");
 /* harmony import */ var phaser__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(phaser__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _scenes_Game__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./scenes/Game */ "./assets/src/js/scenes/Game.js");
+/* harmony import */ var phaser3_rex_plugins_templates_ui_ui_plugin_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! phaser3-rex-plugins/templates/ui/ui-plugin.js */ "./node_modules/phaser3-rex-plugins/templates/ui/ui-plugin.js");
+/* harmony import */ var _scenes_Game__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./scenes/Game */ "./assets/src/js/scenes/Game.js");
+
 
 
 var config = {
@@ -535,7 +527,14 @@ var config = {
     width: 832,
     height: 832
   },
-  scene: [_scenes_Game__WEBPACK_IMPORTED_MODULE_1__["default"]]
+  scene: [_scenes_Game__WEBPACK_IMPORTED_MODULE_2__["default"]],
+  plugins: {
+    scene: [{
+      key: 'rexUI',
+      plugin: phaser3_rex_plugins_templates_ui_ui_plugin_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+      mapping: 'rexUI'
+    }]
+  }
 };
 var game = new phaser__WEBPACK_IMPORTED_MODULE_0___default.a.Game(config);
 
@@ -557,7 +556,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _helpers_Logic__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../helpers/Logic */ "./assets/src/js/helpers/Logic.js");
 /* harmony import */ var _components_Block__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../components/Block */ "./assets/src/js/components/Block.js");
 /* harmony import */ var _components_Board__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../components/Board */ "./assets/src/js/components/Board.js");
-/* harmony import */ var _components_Start__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../components/Start */ "./assets/src/js/components/Start.js");
+/* harmony import */ var _components_Buttons__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../components/Buttons */ "./assets/src/js/components/Buttons.js");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -619,19 +618,18 @@ var Game = /*#__PURE__*/function (_Phaser$Scene) {
       this.state = {};
       this.board = new _components_Board__WEBPACK_IMPORTED_MODULE_4__["default"](this);
       this.renderBoard = this.board.renderBoard();
-      this.start = new _components_Start__WEBPACK_IMPORTED_MODULE_5__["default"](this);
-      this.startButton = this.start.renderStart();
-      this.scoreText = this.add.text(16, 16, '', {
-        fontSize: '18px',
-        fill: '#0000FF'
-      });
+      this.buttons = new _components_Buttons__WEBPACK_IMPORTED_MODULE_5__["default"](this);
+      this.startButton = this.buttons.renderStart();
       this.socket.on('connect', function () {
         console.log('Connected!');
       });
-      this.socket.on('join', function (payload) {
+      this.socket.on('joinGame', function (payload) {
         console.log('Joined!');
+        self.state = payload;
+        self.buttons.joinGame(payload);
       });
       this.socket.on('startGame', function (payload) {
+        console.log('Start game!');
         var id = payload.players.findIndex(function (x) {
           return x.id === self.socket.id;
         });
@@ -642,7 +640,7 @@ var Game = /*#__PURE__*/function (_Phaser$Scene) {
         }
 
         self.state = payload;
-        self.start.startGame(payload);
+        self.buttons.startGame(payload);
       });
       this.socket.on('updateGameState', function (payload) {
         self.state = payload.state;
@@ -707,31 +705,57 @@ var Game = /*#__PURE__*/function (_Phaser$Scene) {
   }, {
     key: "update",
     value: function update() {
+      var w = this.cursors.addKey(Phaser.Input.Keyboard.KeyCodes.W);
       var a = this.cursors.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+      var s = this.cursors.addKey(Phaser.Input.Keyboard.KeyCodes.S);
       var d = this.cursors.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+      var up = this.cursors.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
       var left = this.cursors.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
+      var down = this.cursors.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
       var right = this.cursors.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
 
       if (this.currentBlock) {
         if (Phaser.Input.Keyboard.JustDown(a) || Phaser.Input.Keyboard.JustDown(left)) {
           var angle = -90;
           this.currentBlock.angle += angle;
-          var newShape = Object(_helpers_Logic__WEBPACK_IMPORTED_MODULE_2__["getNewShape"])(this.currentBlock, angle);
+          console.log(this.currentBlock.data.values.shape);
+          var newShape = Object(_helpers_Logic__WEBPACK_IMPORTED_MODULE_2__["rotateShape"])(this.currentBlock, angle);
           this.currentBlock.setData({
             shape: newShape
           });
+          console.log(this.currentBlock.data.values.shape);
         }
 
         if (Phaser.Input.Keyboard.JustDown(d) || Phaser.Input.Keyboard.JustDown(right)) {
-          var _angle = -90;
-
+          var _angle = 90;
           this.currentBlock.angle += _angle;
+          console.log(this.currentBlock.data.values.shape);
 
-          var _newShape = Object(_helpers_Logic__WEBPACK_IMPORTED_MODULE_2__["getNewShape"])(this.currentBlock, _angle);
+          var _newShape = Object(_helpers_Logic__WEBPACK_IMPORTED_MODULE_2__["rotateShape"])(this.currentBlock, _angle);
 
           this.currentBlock.setData({
             shape: _newShape
           });
+          console.log(this.currentBlock.data.values.shape);
+        }
+
+        if (Phaser.Input.Keyboard.JustDown(s) || Phaser.Input.Keyboard.JustDown(down) || Phaser.Input.Keyboard.JustDown(w) || Phaser.Input.Keyboard.JustDown(up)) {
+          if (this.currentBlock.scaleY == 1) {
+            this.currentBlock.scaleY = -1;
+            this.currentBlock.scaleX = -1;
+          } else {
+            this.currentBlock.scaleY = 1;
+            this.currentBlock.scaleX = 1;
+          }
+
+          console.log(this.currentBlock.data.values.shape);
+
+          var _newShape2 = Object(_helpers_Logic__WEBPACK_IMPORTED_MODULE_2__["flipShape"])(this.currentBlock);
+
+          this.currentBlock.setData({
+            shape: _newShape2
+          });
+          console.log(this.currentBlock.data.values.shape);
         }
       }
     }

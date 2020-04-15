@@ -1,9 +1,9 @@
 import io from 'socket.io-client';
 import { DataBlocks } from '../helpers/Data';
-import { playTurn, getNewShape } from '../helpers/Logic';
+import { playTurn, flipShape, rotateShape } from '../helpers/Logic';
 import Block from '../components/Block';
 import Board from '../components/Board';
-import Start from '../components/Start';
+import Buttons from '../components/Buttons';
 
 export default class Game extends Phaser.Scene {
     constructor() {
@@ -32,20 +32,23 @@ export default class Game extends Phaser.Scene {
         this.board = new Board(this);
         this.renderBoard = this.board.renderBoard();
 
-        this.start = new Start(this);
-        this.startButton = this.start.renderStart();
-
-        this.scoreText = this.add.text(16, 16, '', { fontSize: '18px', fill: '#0000FF' });
+        this.buttons = new Buttons(this);
+        this.startButton = this.buttons.renderStart();
 
         this.socket.on('connect', function() {
             console.log('Connected!');
         });
 
-        this.socket.on('join', function(payload) {
+        this.socket.on('joinGame', function(payload) {
             console.log('Joined!');
+
+            self.state = payload;
+            self.buttons.joinGame(payload);
         });
 
         this.socket.on('startGame', function(payload) {
+            console.log('Start game!');
+
             let id = payload.players.findIndex((x) => x.id === self.socket.id);
 
             if (id > -1) {
@@ -54,7 +57,7 @@ export default class Game extends Phaser.Scene {
             }
 
             self.state = payload;
-            self.start.startGame(payload);
+            self.buttons.startGame(payload);
         });
 
         this.socket.on('updateGameState', function(payload) {
@@ -131,9 +134,13 @@ export default class Game extends Phaser.Scene {
     }
 
     update() {
+        let w = this.cursors.addKey(Phaser.Input.Keyboard.KeyCodes.W);
         let a = this.cursors.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+        let s = this.cursors.addKey(Phaser.Input.Keyboard.KeyCodes.S);
         let d = this.cursors.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+        let up = this.cursors.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
         let left = this.cursors.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
+        let down = this.cursors.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
         let right = this.cursors.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
 
         if (this.currentBlock) {
@@ -141,16 +148,46 @@ export default class Game extends Phaser.Scene {
                 let angle = -90;
                 this.currentBlock.angle += angle;
 
-                let newShape = getNewShape(this.currentBlock, angle);
+                console.log(this.currentBlock.data.values.shape);
+
+                let newShape = rotateShape(this.currentBlock, angle);
                 this.currentBlock.setData({ shape: newShape });
+
+                console.log(this.currentBlock.data.values.shape);
             }
 
             if (Phaser.Input.Keyboard.JustDown(d) || Phaser.Input.Keyboard.JustDown(right)) {
-                let angle = -90;
+                let angle = 90;
                 this.currentBlock.angle += angle;
 
-                let newShape = getNewShape(this.currentBlock, angle);
+                console.log(this.currentBlock.data.values.shape);
+
+                let newShape = rotateShape(this.currentBlock, angle);
                 this.currentBlock.setData({ shape: newShape });
+
+                console.log(this.currentBlock.data.values.shape);
+            }
+
+            if (
+                Phaser.Input.Keyboard.JustDown(s) ||
+                Phaser.Input.Keyboard.JustDown(down) ||
+                Phaser.Input.Keyboard.JustDown(w) ||
+                Phaser.Input.Keyboard.JustDown(up)
+            ) {
+                if (this.currentBlock.scaleY == 1) {
+                    this.currentBlock.scaleY = -1;
+                    this.currentBlock.scaleX = -1;
+                } else {
+                    this.currentBlock.scaleY = 1;
+                    this.currentBlock.scaleX = 1;
+                }
+
+                console.log(this.currentBlock.data.values.shape);
+
+                let newShape = flipShape(this.currentBlock);
+                this.currentBlock.setData({ shape: newShape });
+
+                console.log(this.currentBlock.data.values.shape);
             }
         }
     }

@@ -31,10 +31,12 @@ export default class Block {
             return block;
         };
 
-        this.renderOpponent = (x, y, blockIndex, playerIndex, sprite) => {
-            let block = scene.physics.add.sprite(x, y, sprite).setOrigin(0, 0);
+        this.renderOpponent = (gameObject, blockIndex, shape, playerIndex) => {
+            console.log(gameObject);
+            let block = scene.physics.add.sprite(gameObject.x, gameObject.y, gameObject.textureKey).setOrigin(0.5, 0.5);
+            block.rotation = gameObject.rotation;
 
-            block.setData({ shape: DataBlocks[blockIndex], played: false, index: blockIndex });
+            block.setData({ shape: shape, played: false, index: blockIndex });
 
             if (playerIndex == 0) {
                 block.setTint(0x0000ff);

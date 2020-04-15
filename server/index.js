@@ -28,11 +28,11 @@ io.on('connection', function (socket) {
 
         game.addPlayer(socket);
 
-        // if (game.getNumPlayers() == 4) {
-        // game.startGame();
+        console.log(game.getNumPlayers());
 
-        io.emit('startGame', game.state);
-        // }
+        if (game.getNumPlayers() >= 2) {
+            io.emit('startGame', game.state);
+        }
     });
 
     socket.on('updateGameState', function (payload) {

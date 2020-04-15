@@ -6,18 +6,18 @@ var config = {
     physics: {
         default: 'arcade',
         arcade: {
-            debug: true,
-            gravity: { y: 0 }
-        }
+            debug: false,
+            gravity: { y: 0 },
+        },
     },
     scale: {
         mode: Phaser.Scale.FIT,
         parent: 'phaser-example',
         autoCenter: Phaser.Scale.CENTER_BOTH,
         width: 832,
-        height: 832
+        height: 832,
     },
-    scene: [Game]
+    scene: [Game],
 };
 
 const game = new Phaser.Game(config);

@@ -48,10 +48,12 @@ var Block = function Block(scene) {
     return block;
   };
 
-  this.renderOpponent = function (x, y, blockIndex, playerIndex, sprite) {
-    var block = scene.physics.add.sprite(x, y, sprite).setOrigin(0, 0);
+  this.renderOpponent = function (gameObject, blockIndex, shape, playerIndex) {
+    console.log(gameObject);
+    var block = scene.physics.add.sprite(gameObject.x, gameObject.y, gameObject.textureKey).setOrigin(0.5, 0.5);
+    block.rotation = gameObject.rotation;
     block.setData({
-      shape: _helpers_Data__WEBPACK_IMPORTED_MODULE_0__["DataBlocks"][blockIndex],
+      shape: shape,
       played: false,
       index: blockIndex
     });
@@ -520,7 +522,7 @@ var config = {
   physics: {
     "default": 'arcade',
     arcade: {
-      debug: true,
+      debug: false,
       gravity: {
         y: 0
       }
@@ -653,9 +655,8 @@ var Game = /*#__PURE__*/function (_Phaser$Scene) {
         self.scoreText.setText(scoreString);
 
         if (payload.playerIndex !== self.playerIndex) {
-          var sprite = payload.gameObject.textureKey;
           var block = new _components_Block__WEBPACK_IMPORTED_MODULE_3__["default"](self);
-          block.renderOpponent(payload.gameObject.x, payload.gameObject.y, payload.gameObject.rotation, payload.values.index, self.playerIndex, sprite).disableInteractive();
+          block.renderOpponent(payload.gameObject, payload.values.index, payload.values.shape, payload.playerIndex);
         }
       });
       this.input.on('drag', function (pointer, gameObject, dragX, dragY) {

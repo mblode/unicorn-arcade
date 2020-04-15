@@ -8,7 +8,7 @@ import Start from '../components/Start';
 export default class Game extends Phaser.Scene {
     constructor() {
         super({
-            key: 'Game'
+            key: 'Game',
         });
     }
 
@@ -46,7 +46,7 @@ export default class Game extends Phaser.Scene {
         });
 
         this.socket.on('startGame', function(payload) {
-            let id = payload.players.findIndex(x => x.id === self.socket.id);
+            let id = payload.players.findIndex((x) => x.id === self.socket.id);
 
             if (id > -1) {
                 self.player = payload.players[id];
@@ -69,18 +69,14 @@ export default class Game extends Phaser.Scene {
             self.scoreText.setText(scoreString);
 
             if (payload.playerIndex !== self.playerIndex) {
-                let sprite = payload.gameObject.textureKey;
                 let block = new Block(self);
-                block
-                    .renderOpponent(
-                        payload.gameObject.x,
-                        payload.gameObject.y,
-                        payload.gameObject.rotation,
-                        payload.values.index,
-                        self.playerIndex,
-                        sprite
-                    )
-                    .disableInteractive();
+
+                block.renderOpponent(
+                    payload.gameObject,
+                    payload.values.index,
+                    payload.values.shape,
+                    payload.playerIndex
+                );
             }
         });
 
@@ -123,7 +119,7 @@ export default class Game extends Phaser.Scene {
                     playerIndex: self.playerIndex,
                     state: self.state,
                     gameObject: gameObject,
-                    values: values
+                    values: values,
                 };
 
                 self.socket.emit('updateGameState', payload);

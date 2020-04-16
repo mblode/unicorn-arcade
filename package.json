@@ -3,10 +3,10 @@
     "version": "1.0.0",
     "private": true,
     "description": "Board Game prototype for Unicorn Arcade",
-    "main": "server/index.js",
+    "main": "index.js",
     "scripts": {
-        "start": "node server/index.js",
-        "dev": "nodemon server/index.js",
+        "start": "node index.js",
+        "dev": "nodemon index.js",
         "watch": "npm run dev",
         "stop": "lsof -ti :3000 | xargs kill"
     },
@@ -15,8 +15,10 @@
     ],
     "license": "MIT",
     "dependencies": {
-        "body-parser": "1.19.0",
+        "body-parser": "^1.19.0",
         "cors": "^2.8.5",
+        "dotenv": "^8.2.0",
+        "errorhandler": "^1.5.1",
         "express": "4.17.1",
         "socket.io": "^2.3.0"
     },

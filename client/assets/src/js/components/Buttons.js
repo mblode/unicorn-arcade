@@ -3,43 +3,44 @@ import { DataBlocks } from '../helpers/Data';
 
 export default class Buttons {
     constructor(scene) {
+        const style = { font: 'bold 18px Arial', fill: '#333333', align: 'center' };
+
         this.renderStart = () => {
             let self = this;
 
-            var buttons = scene.rexUI.add.buttons({
-                // x: 0,
-                // y: 0,
-                // anchor: undefined,
-                // width: undefined,
-                // height: undefined,
+            // var buttons = scene.rexUI.add.buttons({
+            //     // x: 0,
+            //     // y: 0,
+            //     // anchor: undefined,
+            //     // width: undefined,
+            //     // height: undefined,
 
-                orientation: 0,
+            //     orientation: 0,
 
-                // Elements
-                background: backgroundGameObject,
+            //     // Elements
+            //     background: backgroundGameObject,
 
-                buttons: [
-                    buttonGameObject,
-                    buttonGameObject,
-                    // ...
-                ],
-                expand: false,
-                align: undefined,
-                click: {
-                    mode: 'pointerup',
-                    clickInterval: 100
-                }
+            //     buttons: [
+            //         buttonGameObject,
+            //         buttonGameObject,
+            //         // ...
+            //     ],
+            //     expand: false,
+            //     align: undefined,
+            //     click: {
+            //         mode: 'pointerup',
+            //         clickInterval: 100
+            //     }
 
-                space: 0,
+            //     space: 0,
 
-                // name: '',
-                // draggable: false,
-            
-                // type: undefined,
-                // setValueCallback: undefined,
-                // setValueCallbackScope: undefined
-            });
+            //     // name: '',
+            //     // draggable: false,
 
+            //     // type: undefined,
+            //     // setValueCallback: undefined,
+            //     // setValueCallbackScope: undefined
+            // });
 
             let start = scene.add
                 .text(400, 30, ['Join game'], style)
@@ -121,8 +122,8 @@ export default class Buttons {
         };
 
         this.startGame = (state) => {
-            var panel = new ScrollablePanel(scene, config);
-            scene.add.existing(panel);
+            // var panel = new ScrollablePanel(scene, config);
+            // scene.add.existing(panel);
 
             let scoreString = '';
 

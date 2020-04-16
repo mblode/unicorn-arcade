@@ -22,17 +22,5 @@ mix.options({
 // Setup and configure JS
 mix.js('assets/src/js/main.js', 'assets/dist/js');
 
-// Automatic code-splitting
-mix.extract();
-
 // Directly copy over some folders
 mix.copy('assets/src/img', 'assets/dist/img');
-
-//
-// Production configuration
-//
-
-if (mix.inProduction()) {
-    // Allow versioning in production
-    mix.version();
-}

@@ -69,7 +69,8 @@ export default class Game extends Phaser.Scene {
                 scoreString = scoreString + `${i}: ${payload.state.players[i].score}, `;
             }
 
-            self.scoreText.setText(scoreString);
+            // self.scoreText.setText(scoreString);
+            self.buttons.renderScore(scoreString);
 
             if (payload.playerIndex !== self.playerIndex) {
                 let block = new Block(self);

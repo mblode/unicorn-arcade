@@ -1,5 +1,4 @@
 import Phaser from 'phaser';
-import UIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 import Game from './scenes/Game';
 
 var config = {
@@ -19,15 +18,6 @@ var config = {
         height: 832,
     },
     scene: [Game],
-    plugins: {
-        scene: [
-            {
-                key: 'rexUI',
-                plugin: UIPlugin,
-                mapping: 'rexUI',
-            },
-        ],
-    },
 };
 
 const game = new Phaser.Game(config);

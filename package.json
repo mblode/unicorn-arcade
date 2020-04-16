@@ -8,8 +8,7 @@
         "start": "node server/index.js",
         "dev": "nodemon server/index.js",
         "watch": "npm run dev",
-        "stop": "lsof -ti :3000 | xargs kill",
-        "heroku-postbuild": "cd client && npm install && npm run build"
+        "stop": "lsof -ti :3000 | xargs kill"
     },
     "cacheDirectories": [
         "node_modules"
